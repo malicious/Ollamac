@@ -33,8 +33,7 @@
 		0ACA4D762AF89C27000DA76F /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0ACA4D752AF89C27000DA76F /* MarkdownUI */; };
 		0ACA4D822AF948C4000DA76F /* AppMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACA4D812AF948C4000DA76F /* AppMessages.swift */; };
 		0ACA4D842AF94A9C000DA76F /* ChatContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACA4D832AF94A9C000DA76F /* ChatContextMenu.swift */; };
-		0AE024832AFB898300347C18 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 0AE024822AFB898300347C18 /* Sparkle */; };
-		0AE024862AFB8EB900347C18 /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE024852AFB8EB900347C18 /* UpdaterViewModel.swift */; };
+		CE7C37072B77E084002C45BA /* OllamaKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE7C37062B77E084002C45BA /* OllamaKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,7 +61,6 @@
 		0ACA4D812AF948C4000DA76F /* AppMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMessages.swift; sourceTree = "<group>"; };
 		0ACA4D832AF94A9C000DA76F /* ChatContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatContextMenu.swift; sourceTree = "<group>"; };
 		0AE024842AFB8D0E00347C18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0AE024852AFB8EB900347C18 /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,12 +68,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AE024832AFB898300347C18 /* Sparkle in Frameworks */,
 				0AA41A172AF635AD0053B8DB /* ViewState in Frameworks */,
 				0ACA4D762AF89C27000DA76F /* MarkdownUI in Frameworks */,
 				0ACA4D732AF88DB6000DA76F /* ViewCondition in Frameworks */,
 				0AB30EB22B272A67009C038A /* ChatField in Frameworks */,
 				0ACA4D5E2AF7AC43000DA76F /* SwiftUIIntrospect in Frameworks */,
+				CE7C37072B77E084002C45BA /* OllamaKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +93,7 @@
 			children = (
 				0A4D35832AF541D900846890 /* Ollamac */,
 				0A4D35822AF541D900846890 /* Products */,
+				CE7C37052B77E084002C45BA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -175,7 +174,6 @@
 				0ACA4D4B2AF794B8000DA76F /* CommandViewModel.swift */,
 				0A4D35B52AF562CB00846890 /* MessageViewModel.swift */,
 				0A4D35BD2AF56E7A00846890 /* OllamaViewModel.swift */,
-				0AE024852AFB8EB900347C18 /* UpdaterViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -217,6 +215,13 @@
 			path = MessageViews;
 			sourceTree = "<group>";
 		};
+		CE7C37052B77E084002C45BA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -238,8 +243,8 @@
 				0ACA4D5D2AF7AC43000DA76F /* SwiftUIIntrospect */,
 				0ACA4D722AF88DB6000DA76F /* ViewCondition */,
 				0ACA4D752AF89C27000DA76F /* MarkdownUI */,
-				0AE024822AFB898300347C18 /* Sparkle */,
 				0AB30EB12B272A67009C038A /* ChatField */,
+				CE7C37062B77E084002C45BA /* OllamaKit */,
 			);
 			productName = Ollamac;
 			productReference = 0A4D35812AF541D900846890 /* Ollamac.app */;
@@ -274,7 +279,6 @@
 				0ACA4D5C2AF7AC43000DA76F /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				0ACA4D712AF88DB6000DA76F /* XCRemoteSwiftPackageReference "ViewCondition" */,
 				0ACA4D742AF89C27000DA76F /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
-				0AE024812AFB898300347C18 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				0AB30EB02B272A67009C038A /* XCRemoteSwiftPackageReference "ChatField" */,
 				CE993CE22B76D050006260DC /* XCLocalSwiftPackageReference "../OllamaKit" */,
 			);
@@ -314,7 +318,6 @@
 				0ACA4D4E2AF799A1000DA76F /* RenameChatView.swift in Sources */,
 				0ACA4D512AF7A34D000DA76F /* ModelContext+SaveChanges.swift in Sources */,
 				0AB5F2982B0B9C340040B72E /* TextError.swift in Sources */,
-				0AE024862AFB8EB900347C18 /* UpdaterViewModel.swift in Sources */,
 				0A4D35B82AF5630600846890 /* Message.swift in Sources */,
 				0A4D35C22AF56FD500846890 /* AddChatView.swift in Sources */,
 				0A4D35C62AF57D8800846890 /* MessageListItemView.swift in Sources */,
@@ -587,14 +590,6 @@
 				minimumVersion = 2.2.0;
 			};
 		};
-		0AE024812AFB898300347C18 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.5.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -623,10 +618,10 @@
 			package = 0ACA4D742AF89C27000DA76F /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
 		};
-		0AE024822AFB898300347C18 /* Sparkle */ = {
+		CE7C37062B77E084002C45BA /* OllamaKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0AE024812AFB898300347C18 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
+			package = CE993CE22B76D050006260DC /* XCLocalSwiftPackageReference "../OllamaKit" */;
+			productName = OllamaKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

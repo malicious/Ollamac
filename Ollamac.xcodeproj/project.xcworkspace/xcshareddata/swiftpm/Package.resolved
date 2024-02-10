@@ -28,24 +28,6 @@
       }
     },
     {
-      "identity" : "ollamakit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kevinhermawan/OllamaKit",
-      "state" : {
-        "revision" : "6f3258eb91145bbf26a263123ff88dbbb95208c2",
-        "version" : "2.0.0"
-      }
-    },
-    {
-      "identity" : "sparkle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sparkle-project/Sparkle",
-      "state" : {
-        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
-        "version" : "2.5.1"
-      }
-    },
-    {
       "identity" : "swift-markdown-ui",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gonzalezreal/swift-markdown-ui",

@@ -6,15 +6,11 @@
 //
 
 import OllamaKit
-import Sparkle
 import SwiftUI
 import SwiftData
 
 @main
 struct OllamacApp: App {
-    private var updater: SPUUpdater
-    
-    @State private var updaterViewModel: UpdaterViewModel
     @State private var commandViewModel: CommandViewModel
     @State private var ollamaViewModel: OllamaViewModel
     @State private var chatViewModel: ChatViewModel
@@ -33,13 +29,7 @@ struct OllamacApp: App {
     
     init() {
         let modelContext = sharedModelContainer.mainContext
-        
-        let updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
-        updater = updaterController.updater
-        
-        let updaterViewModel = UpdaterViewModel(updater)
-        _updaterViewModel = State(initialValue: updaterViewModel)
-        
+
         let commandViewModel = CommandViewModel()
         _commandViewModel = State(initialValue: commandViewModel)
         
@@ -59,7 +49,6 @@ struct OllamacApp: App {
     var body: some Scene {
         WindowGroup {
             AppView()
-                .environment(updaterViewModel)
                 .environment(commandViewModel)
                 .environment(chatViewModel)
                 .environment(messageViewModel)
@@ -67,13 +56,6 @@ struct OllamacApp: App {
         }
         .modelContainer(sharedModelContainer)
         .commands {
-            CommandGroup(after: .appInfo) {
-                Button("Check for Updates...") {
-                    updater.checkForUpdates()
-                }
-                .disabled(!updaterViewModel.canCheckForUpdates)
-            }
-            
             CommandGroup(replacing: .newItem) {
                 Button("New Chat") {
                     commandViewModel.isAddChatViewPresented = true
