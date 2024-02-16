@@ -13,6 +13,7 @@ struct MessageListItemView: View {
     private var isGenerating: Bool = false
     private var isFinalMessage: Bool = false
 
+    // This field only exists for prompt-type messages
     private var promptCreatedAt: Date? = nil
 
     private var generationCompleteTime: Date? = nil
@@ -59,25 +60,12 @@ struct MessageListItemView: View {
                 Text(roleName)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.accent)
-                
-                // TODO: This logic is starting to look complicated, move it back into the ViewModel
-                if generationCompleteTime != nil && generationStartTime != nil {
-                    Text(String(format: "\(generationCompleteTime!.formatted(date: .numeric, time: .standard)), %.02f seconds ago", generationCompleteTime!.timeIntervalSince(generationStartTime!)))
-                        .font(.title3)
-                } else if generationCompleteTime != nil && generationStartTime == nil {
-                    Text(String(format: "completed or reloaded at \(generationCompleteTime!.formatted(date: .numeric, time: .standard))"))
+
+                if promptCreatedAt != nil {
+                    Text("originally sent \(promptCreatedAt!.formatted(date: .numeric, time: .standard))")
                         .font(.title3)
                 }
-                else if generationCompleteTime == nil && generationStartTime != nil {
-                    // This text is moved lower, into the "chat" area.
-                }
-                else {
-                    if promptCreatedAt != nil {
-                        Text("originally sent \(promptCreatedAt!.formatted(date: .numeric, time: .standard))")
-                            .font(.title3)
-                    }
-                }
-                
+
                 Spacer()
                 
                 Button (action: errorAction) {
@@ -109,11 +97,34 @@ struct MessageListItemView: View {
                 .visible(if: isRegenerateButtonVisible)
             }
             
-            if generationCompleteTime == nil && generationStartTime != nil {
-                Text(String(format: "[sent generation request %.00f seconds ago, at \(generationStartTime!.formatted(date: .numeric, time: .standard))]", generationElapsedTime))
-                    .onReceive(generationTimer) { currentTime in
-                        generationElapsedTime = currentTime.timeIntervalSince(generationStartTime!)
-                    }
+            if generationCompleteTime == nil {
+                if generationStartTime == nil {
+                    Text("start: nil")
+                    Text("complete: nil")
+                }
+                else {
+                    Text(String(format: "start: \(generationStartTime!.formatted(date: .numeric, time: .standard)), %.00f seconds ago", generationElapsedTime))
+                        .onReceive(generationTimer) { currentTime in
+                            generationElapsedTime = currentTime.timeIntervalSince(generationStartTime!)
+                        }
+                    Text("complete: nil")
+                }
+            }
+            else {
+                if generationStartTime == nil {
+                    Text("start: nil")
+                    Text("complete: \(generationCompleteTime!.formatted(date: .numeric, time: .standard))")
+                }
+                else {
+                    Text("start: \(generationStartTime!.formatted(date: .numeric, time: .standard))")
+                    Text(
+                        String(format: "complete: \(generationCompleteTime!.formatted(date: .numeric, time: .standard)), %.02f seconds ago", generationCompleteTime!.timeIntervalSince(generationStartTime!)))
+                }
+            }
+            if let promptCreatedAt = promptCreatedAt?.formatted(date: .numeric, time: .standard) {
+                Text("createdAt: \(promptCreatedAt)")
+            } else {
+                Text("createdAt: nil")
             }
 
             ProgressView()
@@ -221,14 +232,10 @@ struct MessageListItemView: View {
         var view = self
 
         if isGenerating {
-            if view.generationStartTime == nil {
-                view.generationStartTime = Date.now
-            }
+            view.generationStartTime = Date.now
         }
         else if !isGenerating {
-            if view.generationCompleteTime == nil {
-                view.generationCompleteTime = Date.now
-            }
+            view.generationCompleteTime = Date.now
         }
 
         view.isGenerating = isGenerating
@@ -240,9 +247,6 @@ struct MessageListItemView: View {
         var view = self
         view.isFinalMessage = isFinalMessage
         
-        if view.generationCompleteTime == nil {
-            view.generationCompleteTime = Date.now
-        }
         return view
     }
     

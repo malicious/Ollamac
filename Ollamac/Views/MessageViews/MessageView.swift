@@ -48,7 +48,6 @@ struct MessageView: View {
                     regenerateAction(for: message)
                 }
                 .roleName("Assistant")
-//                .promptCreatedAt(message.promptCreatedAt)
                 .generating(message.response.isNil && isGenerating)
                 .finalMessage(index == messageViewModel.messages.endIndex - 1)
                 .error(message.error, message: messageViewModel.sendViewState?.errorMessage)
@@ -137,7 +136,6 @@ struct MessageView: View {
         
         Task {
             try chatViewModel.modify(chat)
-            messageViewModel.sendViewState = .loading
             await messageViewModel.regenerate(message)
         }
     }
