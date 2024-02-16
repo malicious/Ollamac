@@ -38,12 +38,12 @@ struct MessageView: View {
                 let message = messageViewModel.messages[index]
                 
                 MessageListItemView(message.prompt ?? "")
-                    .assistant(false)
+                    .roleName("You")
                 
                 MessageListItemView(message.response ?? "") {
                     regenerateAction(for: message)
                 }
-                .assistant(true)
+                .roleName("Assistant")
                 .generating(message.response.isNil && isGenerating)
                 .finalMessage(index == messageViewModel.messages.endIndex - 1)
                 .error(message.error, message: messageViewModel.sendViewState?.errorMessage)

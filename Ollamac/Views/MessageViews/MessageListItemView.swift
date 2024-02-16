@@ -16,6 +16,9 @@ struct MessageListItemView: View {
     private var isError: Bool = false
     private var errorMessage: String? = nil
     
+    // TODO: should be some kind of enum, if those can support "agent"/RP names
+    private var roleName: String = "[unknown]"
+
     let text: String
     let regenerateAction: () -> Void
     
@@ -33,7 +36,7 @@ struct MessageListItemView: View {
     @State private var isCopied: Bool = false
     
     private var isCopyButtonVisible: Bool {
-        isHovered && isAssistant && !isGenerating
+        isHovered && !isGenerating
     }
     
     private var isRegenerateButtonVisible: Bool {
@@ -42,7 +45,7 @@ struct MessageListItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(isAssistant ? "Assistant" : "You")
+            Text(roleName)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.accent)
             
@@ -100,7 +103,6 @@ struct MessageListItemView: View {
                 .visible(if: isRegenerateButtonVisible)
             }
             .padding(.top, 8)
-            .visible(if: isAssistant, removeCompletely: true)
         }
         .padding(.vertical)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -123,9 +125,9 @@ struct MessageListItemView: View {
     }
     
     // MARK: - Modifiers
-    public func assistant(_ isAssistant: Bool) -> MessageListItemView {
+    public func roleName(_ roleName: String) -> MessageListItemView {
         var view = self
-        view.isAssistant = isAssistant
+        view.roleName = roleName
         
         return view
     }
