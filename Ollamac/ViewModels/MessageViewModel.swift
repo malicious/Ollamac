@@ -33,7 +33,7 @@ final class MessageViewModel {
     func fetch(for chat: Chat) throws {
         let chatId = chat.id
         let predicate = #Predicate<Message>{ $0.chat?.id == chatId }
-        let sortDescriptor = SortDescriptor(\Message.createdAt)
+        let sortDescriptor = SortDescriptor(\Message.promptCreatedAt)
         let fetchDescriptor = FetchDescriptor<Message>(predicate: predicate, sortBy: [sortDescriptor])
         
         messages = try modelContext.fetch(fetchDescriptor)

@@ -14,11 +14,12 @@ final class Message: Identifiable {
     @Attribute(.unique) var id: UUID = UUID()
     
     var prompt: String?
+    @Attribute(originalName: "createdAt")
+    var promptCreatedAt: Date = Date.now
     var response: String?
     var context: [Int]?
     var done: Bool = false
     var error: Bool = false
-    var createdAt: Date = Date.now
     
     @Relationship var chat: Chat?
         

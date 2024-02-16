@@ -13,8 +13,10 @@ struct MessageListItemView: View {
     private var isGenerating: Bool = false
     private var isFinalMessage: Bool = false
 
+    private var promptCreatedAt: Date? = nil
+
     private var generationCompleteTime: Date? = nil
-    private var generationStartTime: Date? = nil
+    @State private var generationStartTime: Date? = nil
     let generationTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     @State var generationElapsedTime = 0.0
 
@@ -26,17 +28,17 @@ struct MessageListItemView: View {
     private var roleName: String = "[unknown]"
 
     let text: MarkdownContent
-    let regenerateAction: () -> Void
+    let callerRegenerateAction: () -> Void
     
     init(_ text: MarkdownContent) {
         self.text = text
-        self.regenerateAction = {}
+        self.callerRegenerateAction = {}
         self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
     }
     
     init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
         self.text = text
-        self.regenerateAction = regenerateAction
+        self.callerRegenerateAction = regenerateAction
         self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
     }
     
@@ -58,9 +60,22 @@ struct MessageListItemView: View {
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.accent)
                 
-                if generationCompleteTime != nil {
-                    Text(generationCompleteTime!.formatted(date: .numeric, time: .standard))
+                // TODO: This logic is starting to look complicated, move it back into the ViewModel
+                if generationCompleteTime != nil && generationStartTime != nil {
+                    Text(String(format: "\(generationCompleteTime!.formatted(date: .numeric, time: .standard)), %.02f seconds ago", generationCompleteTime!.timeIntervalSince(generationStartTime!)))
                         .font(.title3)
+                } else if generationCompleteTime != nil && generationStartTime == nil {
+                    Text(String(format: "completed or reloaded at \(generationCompleteTime!.formatted(date: .numeric, time: .standard))"))
+                        .font(.title3)
+                }
+                else if generationCompleteTime == nil && generationStartTime != nil {
+                    // This text is moved lower, into the "chat" area.
+                }
+                else {
+                    if promptCreatedAt != nil {
+                        Text("originally sent \(promptCreatedAt!.formatted(date: .numeric, time: .standard))")
+                            .font(.title3)
+                    }
                 }
                 
                 Spacer()
@@ -83,7 +98,7 @@ struct MessageListItemView: View {
                 .foregroundColor(.accentColor)
                 .visible(if: isCopyButtonVisible)
 
-                Button(action: regenerateAction) {
+                Button(action: callerRegenerateAction) {
                     Image(systemName: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.accessoryBar)
@@ -150,7 +165,7 @@ struct MessageListItemView: View {
                 .help("Copy")
                 .visible(if: isCopyButtonVisible)
                 
-                Button(action: regenerateAction) {
+                Button(action: callerRegenerateAction) {
                     Image(systemName: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.accessoryBar)
@@ -169,6 +184,14 @@ struct MessageListItemView: View {
     }
     
     // MARK: - Actions
+    private func errorAction() {
+        if isErrorViewVisible {
+            isErrorViewVisible = false
+        } else {
+            isErrorViewVisible = true
+        }
+    }
+    
     private func copyAction() {
         let plainText = text.renderPlainText()
         
@@ -179,14 +202,6 @@ struct MessageListItemView: View {
         isCopied = true
     }
     
-    private func errorAction() {
-        if isErrorViewVisible {
-            isErrorViewVisible = false
-        } else {
-            isErrorViewVisible = true
-        }
-    }
-    
     // MARK: - Modifiers
     public func roleName(_ roleName: String) -> MessageListItemView {
         var view = self
@@ -195,16 +210,28 @@ struct MessageListItemView: View {
         return view
     }
     
+    public func promptCreatedAt(_ promptCreatedAt: Date) -> MessageListItemView {
+        var view = self
+        view.promptCreatedAt = promptCreatedAt
+
+        return view
+    }
+    
     public func generating(_ isGenerating: Bool) -> MessageListItemView {
         var view = self
-        view.isGenerating = isGenerating
-        
+
         if isGenerating {
-            view.generationStartTime = Date.now
-        } else {
-            // TODO: This also gets set if we simply loaded the chat for the first time, need to persist the time.
-            view.generationCompleteTime = Date.now
+            if view.generationStartTime == nil {
+                view.generationStartTime = Date.now
+            }
         }
+        else if !isGenerating {
+            if view.generationCompleteTime == nil {
+                view.generationCompleteTime = Date.now
+            }
+        }
+
+        view.isGenerating = isGenerating
         
         return view
     }
@@ -212,7 +239,10 @@ struct MessageListItemView: View {
     public func finalMessage(_ isFinalMessage: Bool) -> MessageListItemView {
         var view = self
         view.isFinalMessage = isFinalMessage
-
+        
+        if view.generationCompleteTime == nil {
+            view.generationCompleteTime = Date.now
+        }
         return view
     }
     
