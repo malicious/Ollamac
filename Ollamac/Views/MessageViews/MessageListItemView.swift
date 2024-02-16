@@ -100,31 +100,41 @@ struct MessageListItemView: View {
             if generationCompleteTime == nil {
                 if generationStartTime == nil {
                     Text("start: nil")
+                        .foregroundStyle(.brown)
                     Text("complete: nil")
+                        .foregroundStyle(.brown)
                 }
                 else {
                     Text(String(format: "start: \(generationStartTime!.formatted(date: .numeric, time: .standard)), %.00f seconds ago", generationElapsedTime))
+                        .foregroundStyle(.brown)
                         .onReceive(generationTimer) { currentTime in
                             generationElapsedTime = currentTime.timeIntervalSince(generationStartTime!)
                         }
                     Text("complete: nil")
+                        .foregroundStyle(.brown)
                 }
             }
             else {
                 if generationStartTime == nil {
                     Text("start: nil")
+                        .foregroundStyle(.brown)
                     Text("complete: \(generationCompleteTime!.formatted(date: .numeric, time: .standard))")
+                        .foregroundStyle(.brown)
                 }
                 else {
                     Text("start: \(generationStartTime!.formatted(date: .numeric, time: .standard))")
+                        .foregroundStyle(.brown)
                     Text(
                         String(format: "complete: \(generationCompleteTime!.formatted(date: .numeric, time: .standard)), %.02f seconds ago", generationCompleteTime!.timeIntervalSince(generationStartTime!)))
+                        .foregroundStyle(.brown)
                 }
             }
             if let promptCreatedAt = promptCreatedAt?.formatted(date: .numeric, time: .standard) {
                 Text("createdAt: \(promptCreatedAt)")
+                    .foregroundStyle(.brown)
             } else {
                 Text("createdAt: nil")
+                    .foregroundStyle(.brown)
             }
 
             ProgressView()
