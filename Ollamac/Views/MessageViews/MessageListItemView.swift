@@ -15,20 +15,22 @@ struct MessageListItemView: View {
 
     private var hasErrorOccurred: Bool = false
     private var errorMessage: String? = nil
-    @State private var isErrorViewVisible: Bool = false
+    @State private var isErrorViewVisible: Bool
     
     // TODO: should be some kind of enum, if those can support "agent"/RP names
     private var roleName: String = "[unknown]"
 
-    let text: String
+    let text: MarkdownContent
     let regenerateAction: () -> Void
     
-    init(_ text: String) {
+    init(_ text: MarkdownContent) {
+        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
         self.text = text
         self.regenerateAction = {}
     }
     
-    init(_ text: String, regenerateAction: @escaping () -> Void) {
+    init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
+        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
         self.text = text
         self.regenerateAction = regenerateAction
     }
@@ -151,8 +153,7 @@ struct MessageListItemView: View {
     
     // MARK: - Actions
     private func copyAction() {
-        let content = MarkdownContent(text)
-        let plainText = content.renderPlainText()
+        let plainText = text.renderPlainText()
         
         let pasteBoard = NSPasteboard.general
         pasteBoard.clearContents()

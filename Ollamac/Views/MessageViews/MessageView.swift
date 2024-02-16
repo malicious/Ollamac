@@ -6,6 +6,7 @@
 //
 
 import ChatField
+import MarkdownUI
 import SwiftUI
 import SwiftUIIntrospect
 import ViewCondition
@@ -37,10 +38,12 @@ struct MessageView: View {
             List(messageViewModel.messages.indices, id: \.self) { index in
                 let message = messageViewModel.messages[index]
                 
-                MessageListItemView(message.prompt ?? "")
+                let rendered_prompt_text = MarkdownContent(message.prompt ?? "")
+                MessageListItemView(rendered_prompt_text)
                     .roleName("You")
                 
-                MessageListItemView(message.response ?? "") {
+                let rendered_response_text = MarkdownContent(message.response ?? "")
+                MessageListItemView(rendered_response_text) {
                     regenerateAction(for: message)
                 }
                 .roleName("Assistant")
