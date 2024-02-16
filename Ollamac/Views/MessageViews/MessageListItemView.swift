@@ -10,7 +10,6 @@ import SwiftUI
 import ViewCondition
 
 struct MessageListItemView: View {
-    private var isAssistant: Bool = false
     private var isGenerating: Bool = false
     private var isFinalMessage: Bool = false
 
