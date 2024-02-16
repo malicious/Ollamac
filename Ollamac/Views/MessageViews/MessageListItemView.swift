@@ -45,10 +45,42 @@ struct MessageListItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(roleName)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.accent)
-            
+            HStack(alignment: .bottom, spacing: 0) {
+                Text(roleName)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.accent)
+                
+                Spacer()
+                
+                Button (action: errorAction) {
+                    Image(systemName: isErrorViewVisible ? "exclamationmark.circle.fill" : "exclamationmark.circle")
+                }
+                .buttonStyle(.accessoryBar)
+                .clipShape(.circle)
+                .help("Show error message")
+                .foregroundColor(.accentColor)
+                .visible(if: isHovered)
+
+                Button(action: copyAction) {
+                    Image(systemName: isCopied ? "list.clipboard.fill" : "clipboard")
+                }
+                .buttonStyle(.accessoryBar)
+                .clipShape(.circle)
+                .help("Copy")
+                .foregroundColor(.accentColor)
+                .visible(if: isCopyButtonVisible)
+
+                Button(action: regenerateAction) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                }
+                .buttonStyle(.accessoryBar)
+                .clipShape(.circle)
+                .help("Regenerate")
+                .foregroundColor(.accentColor)
+                // TODO: This still occupies a space on the bar, need to make this visibly disabled.
+                .visible(if: isRegenerateButtonVisible)
+            }
+
             ProgressView()
                 .controlSize(.small)
                 .visible(if: isGenerating, removeCompletely: true)
