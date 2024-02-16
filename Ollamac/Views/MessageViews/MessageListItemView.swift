@@ -16,7 +16,7 @@ struct MessageListItemView: View {
     private var promptCreatedAt: Date? = nil
 
     private var generationCompleteTime: Date? = nil
-    @State private var generationStartTime: Date? = nil
+    private var generationStartTime: Date? = nil
     let generationTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     @State var generationElapsedTime = 0.0
 
