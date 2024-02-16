@@ -13,9 +13,14 @@ struct MessageListItemView: View {
     private var isGenerating: Bool = false
     private var isFinalMessage: Bool = false
 
+    private var generationCompleteTime: Date? = nil
+    private var generationStartTime: Date? = nil
+    let generationTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    @State var generationElapsedTime = 0.0
+
     private var hasErrorOccurred: Bool = false
     private var errorMessage: String? = nil
-    @State private var isErrorViewVisible: Bool
+    @State private var isErrorViewVisible: Bool = false
     
     // TODO: should be some kind of enum, if those can support "agent"/RP names
     private var roleName: String = "[unknown]"
@@ -24,15 +29,15 @@ struct MessageListItemView: View {
     let regenerateAction: () -> Void
     
     init(_ text: MarkdownContent) {
-        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
         self.text = text
         self.regenerateAction = {}
+        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
     }
     
     init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
-        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
         self.text = text
         self.regenerateAction = regenerateAction
+        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
     }
     
     @State private var isHovered: Bool = false
@@ -48,10 +53,15 @@ struct MessageListItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .bottom, spacing: 0) {
+            HStack(alignment: .bottom, spacing: 16) {
                 Text(roleName)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.accent)
+                
+                if generationCompleteTime != nil {
+                    Text(generationCompleteTime!.formatted(date: .numeric, time: .standard))
+                        .font(.title3)
+                }
                 
                 Spacer()
                 
@@ -82,6 +92,13 @@ struct MessageListItemView: View {
                 .foregroundColor(.accentColor)
                 // TODO: This still occupies a space on the bar, need to make this visibly disabled.
                 .visible(if: isRegenerateButtonVisible)
+            }
+            
+            if generationCompleteTime == nil && generationStartTime != nil {
+                Text(String(format: "[sent generation request %.00f seconds ago, at \(generationStartTime!.formatted(date: .numeric, time: .standard))]", generationElapsedTime))
+                    .onReceive(generationTimer) { currentTime in
+                        generationElapsedTime = currentTime.timeIntervalSince(generationStartTime!)
+                    }
             }
 
             ProgressView()
@@ -182,13 +199,20 @@ struct MessageListItemView: View {
         var view = self
         view.isGenerating = isGenerating
         
+        if isGenerating {
+            view.generationStartTime = Date.now
+        } else {
+            // TODO: This also gets set if we simply loaded the chat for the first time, need to persist the time.
+            view.generationCompleteTime = Date.now
+        }
+        
         return view
     }
     
     public func finalMessage(_ isFinalMessage: Bool) -> MessageListItemView {
         var view = self
         view.isFinalMessage = isFinalMessage
-        
+
         return view
     }
     
