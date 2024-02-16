@@ -13,8 +13,10 @@ struct MessageListItemView: View {
     private var isAssistant: Bool = false
     private var isGenerating: Bool = false
     private var isFinalMessage: Bool = false
-    private var isError: Bool = false
+
+    private var hasErrorOccurred: Bool = false
     private var errorMessage: String? = nil
+    @State private var isErrorViewVisible: Bool = false
     
     // TODO: should be some kind of enum, if those can support "agent"/RP names
     private var roleName: String = "[unknown]"
@@ -84,13 +86,17 @@ struct MessageListItemView: View {
             ProgressView()
                 .controlSize(.small)
                 .visible(if: isGenerating, removeCompletely: true)
-            
-            if let errorMessage {
-                TextError(errorMessage)
-                    .visible(if: isError, removeCompletely: true)
-                    .hide(if: isGenerating, removeCompletely: true)
-            }
-            
+
+            let errorViewText = {
+                if hasErrorOccurred {
+                    errorMessage ?? AppMessages.generalErrorMessage
+                } else {
+                    "[no error]"
+                }
+            }()
+            TextError(errorViewText)
+                .visible(if: isErrorViewVisible, removeCompletely: true)
+
             Markdown(text)
                 .textSelection(.enabled)
                 .markdownTextStyle(\.text) {
@@ -115,7 +121,7 @@ struct MessageListItemView: View {
                         .padding(.bottom)
                 }
                 .hide(if: isGenerating, removeCompletely: true)
-                .hide(if: isError, removeCompletely: true)
+                .hide(if: hasErrorOccurred, removeCompletely: true)
             
             HStack(alignment: .center, spacing: 8) {
                 Button(action: copyAction) {
@@ -156,6 +162,14 @@ struct MessageListItemView: View {
         isCopied = true
     }
     
+    private func errorAction() {
+        if isErrorViewVisible {
+            isErrorViewVisible = false
+        } else {
+            isErrorViewVisible = true
+        }
+    }
+    
     // MARK: - Modifiers
     public func roleName(_ roleName: String) -> MessageListItemView {
         var view = self
@@ -180,8 +194,9 @@ struct MessageListItemView: View {
     
     public func error(_ isError: Bool, message: String?) -> MessageListItemView {
         var view = self
-        view.isError = isError
-        view.errorMessage = message ?? AppMessages.generalErrorMessage
+        view.hasErrorOccurred = isError
+        view.errorMessage = message
+        view.isErrorViewVisible = true
         
         return view
     }
