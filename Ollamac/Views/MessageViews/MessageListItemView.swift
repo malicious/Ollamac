@@ -129,13 +129,6 @@ struct MessageListItemView: View {
                         .foregroundStyle(.brown)
                 }
             }
-            if let promptCreatedAt = promptCreatedAt?.formatted(date: .numeric, time: .standard) {
-                Text("createdAt: \(promptCreatedAt)")
-                    .foregroundStyle(.brown)
-            } else {
-                Text("createdAt: nil")
-                    .foregroundStyle(.brown)
-            }
 
             ProgressView()
                 .controlSize(.small)
