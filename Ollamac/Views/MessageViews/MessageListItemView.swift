@@ -32,8 +32,8 @@ struct MessageListItemView: View {
     let responseGenerationTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     @State var responseGenerationElapsedTime = 0.0
 
-    private var hasErrorOccurred: Bool = false
     private var errorMessage: String? = nil
+    private var errorOccurredAt: Date? = nil
     @State private var isErrorViewVisible: Bool = false
     
     // TODO: should be some kind of enum, if those can support "agent"/RP names
@@ -45,9 +45,9 @@ struct MessageListItemView: View {
     init(_ text: MarkdownContent) {
         self.text = text
         self.callerRegenerateAction = {}
-        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
-        
         // TODO: all these variable inits aren't reflected on first/initial draw, a lot of the time
+        self.isErrorViewVisible = errorMessage != nil
+        
         self.responseGenerationElapsedTime = 0.0
         if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
             self.responseGenerationElapsedTime = Date.now.timeIntervalSince(self.responseFirstTokenAt!)
@@ -57,7 +57,7 @@ struct MessageListItemView: View {
     init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
         self.text = text
         self.callerRegenerateAction = regenerateAction
-        self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
+        self.isErrorViewVisible = errorMessage != nil
         
         self.responseGenerationElapsedTime = 0.0
         if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
@@ -153,19 +153,12 @@ struct MessageListItemView: View {
                 }
             }
 
+            TextError(errorMessage ?? "[no error]")
+                .visible(if: isErrorViewVisible, removeCompletely: true)
+
             ProgressView()
                 .controlSize(.small)
                 .visible(if: isGenerating, removeCompletely: true)
-
-            let errorViewText = {
-                if hasErrorOccurred {
-                    errorMessage ?? AppMessages.generalErrorMessage
-                } else {
-                    "[no error]"
-                }
-            }()
-            TextError(errorViewText)
-                .visible(if: isErrorViewVisible, removeCompletely: true)
 
             Markdown(text)
                 .textSelection(.enabled)
@@ -191,7 +184,6 @@ struct MessageListItemView: View {
                         .padding(.bottom)
                 }
                 .hide(if: isGenerating, removeCompletely: true)
-                .hide(if: hasErrorOccurred, removeCompletely: true)
             
             HStack(alignment: .center, spacing: 8) {
                 Button(action: copyAction) {
@@ -289,10 +281,11 @@ struct MessageListItemView: View {
         return view
     }
     
-    public func error(_ isError: Bool, message: String?) -> MessageListItemView {
+    public func error(_ errorMessage: String?, errorOccurredAt: Date? = nil) -> MessageListItemView {
         var view = self
-        view.hasErrorOccurred = isError
-        view.errorMessage = message
+        view.errorMessage = errorMessage
+        view.errorOccurredAt = errorOccurredAt
+        // TODO: Why does this sometimes not stick?
         view.isErrorViewVisible = true
         
         return view

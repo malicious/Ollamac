@@ -23,7 +23,11 @@ final class Message: Identifiable {
 
     var context: [Int]?
     var done: Bool = false
+    // Deprecated; use errorOccurredAt / errorMessage to tell that an error occurred
     var error: Bool = false
+    
+    var errorMessage: String? = nil
+    var errorOccurredAt: Date? = nil
     
     @Relationship var chat: Chat?
         

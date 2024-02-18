@@ -53,7 +53,7 @@ struct MessageView: View {
                 .responseLastTokenAt(message.responseLastTokenAt)
                 .generating(message.response.isNil && isGenerating)
                 .finalMessage(index == messageViewModel.messages.endIndex - 1)
-                .error(message.error, message: messageViewModel.sendViewState?.errorMessage)
+                .error(message.errorMessage, errorOccurredAt: message.errorOccurredAt)
                 .id(message)
             }
             .onAppear {

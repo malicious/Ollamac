@@ -126,7 +126,8 @@ final class MessageViewModel {
         if self.messages.isEmpty { return }
         
         let lastIndex = self.messages.count - 1
-        self.messages[lastIndex].error = true
+        self.messages[lastIndex].errorMessage = errorMessage
+        self.messages[lastIndex].errorOccurredAt = Date.now
         self.messages[lastIndex].done = false
         self.messages[lastIndex].responseLastTokenAt = Date.now
         
@@ -138,7 +139,8 @@ final class MessageViewModel {
         if self.messages.isEmpty { return }
         
         let lastIndex = self.messages.count - 1
-        self.messages[lastIndex].error = false
+        self.messages[lastIndex].errorMessage = nil
+        self.messages[lastIndex].errorOccurredAt = nil
         self.messages[lastIndex].done = true
         self.messages[lastIndex].responseLastTokenAt = Date.now
         
