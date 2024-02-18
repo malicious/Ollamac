@@ -74,14 +74,26 @@ struct MessageListItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .bottom, spacing: 16) {
+            HStack(alignment: .center, spacing: 8) {
                 Text(roleName)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.accent)
 
                 if promptCreatedAt != nil {
-                    Text("originally sent \(promptCreatedAt!.formatted(date: .numeric, time: .standard))")
-                        .font(.title3)
+                    Text("first sent \(promptCreatedAt!.formatted(date: .numeric, time: .standard))")
+                        .foregroundStyle(.brown)
+                } else {
+                    if responseRequestedAt != nil && responseFirstTokenAt == nil && errorMessage == nil {
+                        Text(String(format: "last requested: \(asString(responseRequestedAt)), %.00f seconds ago", responseGenerationElapsedTime))
+                            .foregroundStyle(.brown)
+                            .onReceive(responseGenerationTimer) { currentTime in
+                                responseGenerationElapsedTime = currentTime.timeIntervalSince(responseRequestedAt!)
+                            }
+                    }
+                    else {
+                        Text("last requested: \(asString(responseRequestedAt))")
+                            .foregroundStyle(.brown)
+                    }
                 }
 
                 Spacer()
@@ -108,21 +120,13 @@ struct MessageListItemView: View {
             
             // TODO: This is actually a very complex state machine.
             //       We make do by doing a bunch of if checks.
-            if promptCreatedAt == nil {
-                if responseRequestedAt != nil && responseFirstTokenAt == nil && errorMessage == nil {
-                    Text(String(format: "requestedAt: \(asString(responseRequestedAt)), %.00f seconds ago", responseGenerationElapsedTime))
-                        .foregroundStyle(.brown)
-                        .onReceive(responseGenerationTimer) { currentTime in
-                            responseGenerationElapsedTime = currentTime.timeIntervalSince(responseRequestedAt!)
-                        }
-                }
-                else {
-                    Text("requestedAt: \(asString(responseRequestedAt))")
-                        .foregroundStyle(.brown)
-                }
-
+            if isGenerating {
+                ProgressView()
+                    .controlSize(.extraLarge)
+            }
+            else if promptCreatedAt == nil {
                 if responseRequestedAt != nil && responseFirstTokenAt != nil {
-                    Text(String(format: "firstTokenAt: \(asString(responseFirstTokenAt)) — %.02f seconds elapsed since request", responseFirstTokenAt!.timeIntervalSince(responseRequestedAt!)))
+                    Text(String(format: "firstTokenAt: \(asString(responseFirstTokenAt)) — %.02f seconds elapsed after request", responseFirstTokenAt!.timeIntervalSince(responseRequestedAt!)))
                         .foregroundStyle(.brown)
                 }
                 else {
@@ -131,7 +135,7 @@ struct MessageListItemView: View {
                 }
                 
                 if responseLastTokenAt != nil && responseRequestedAt != nil {
-                    Text(String(format: "lastTokenAt: \(asString(responseLastTokenAt)) — %.02f seconds elapsed since request", responseLastTokenAt!.timeIntervalSince(responseRequestedAt!)))
+                    Text(String(format: "lastTokenAt: \(asString(responseLastTokenAt)) — %.02f seconds elapsed after request", responseLastTokenAt!.timeIntervalSince(responseRequestedAt!)))
                         .foregroundStyle(.brown)
                 }
                 else {
@@ -139,14 +143,20 @@ struct MessageListItemView: View {
                         .foregroundStyle(.brown)
                 }
             }
+            
+            let estimatedTokenCount: Int = {
+                let characterSet = CharacterSet.whitespacesAndNewlines.union(.punctuationCharacters)
+                let components = text.renderPlainText().components(separatedBy: characterSet)
+                
+                let wordsOnly = components.filter { !$0.isEmpty }
+                return wordsOnly.count
+            }()
+            Text("estimated token count: \(estimatedTokenCount)")
+                .foregroundStyle(.brown)
 
             if let errorMessage {
                 TextError(errorMessage)
             }
-
-            ProgressView()
-                .controlSize(.small)
-                .visible(if: isGenerating, removeCompletely: true)
 
             Markdown(text)
                 .textSelection(.enabled)
