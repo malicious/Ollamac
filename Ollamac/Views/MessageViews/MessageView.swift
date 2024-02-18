@@ -48,6 +48,9 @@ struct MessageView: View {
                     regenerateAction(for: message)
                 }
                 .roleName("Assistant")
+                .responseRequestedAt(message.responseRequestedAt)
+                .responseFirstTokenAt(message.responseFirstTokenAt)
+                .responseLastTokenAt(message.responseLastTokenAt)
                 .generating(message.response.isNil && isGenerating)
                 .finalMessage(index == messageViewModel.messages.endIndex - 1)
                 .error(message.error, message: messageViewModel.sendViewState?.errorMessage)

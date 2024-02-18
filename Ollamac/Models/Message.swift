@@ -17,6 +17,10 @@ final class Message: Identifiable {
     @Attribute(originalName: "createdAt")
     var promptCreatedAt: Date = Date.now
     var response: String?
+    var responseRequestedAt: Date? = nil
+    var responseFirstTokenAt: Date? = nil
+    var responseLastTokenAt: Date? = nil
+
     var context: [Int]?
     var done: Bool = false
     var error: Bool = false

@@ -9,17 +9,28 @@ import MarkdownUI
 import SwiftUI
 import ViewCondition
 
+private func asString(_ d: Date?) -> String {
+    if d == nil {
+        return "-"
+    }
+    else {
+        return d!.formatted(date: .numeric, time: .standard)
+    }
+}
+
 struct MessageListItemView: View {
     private var isGenerating: Bool = false
     private var isFinalMessage: Bool = false
 
     // This field only exists for prompt-type messages
     private var promptCreatedAt: Date? = nil
-
-    private var generationCompleteTime: Date? = nil
-    private var generationStartTime: Date? = nil
-    let generationTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
-    @State var generationElapsedTime = 0.0
+    
+    private var responseRequestedAt: Date? = nil
+    private var responseFirstTokenAt: Date? = nil
+    private var responseLastTokenAt: Date? = nil
+    // TODO: bug where old value flashes on screen for a second, during regenerations
+    let responseGenerationTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    @State var responseGenerationElapsedTime = 0.0
 
     private var hasErrorOccurred: Bool = false
     private var errorMessage: String? = nil
@@ -35,12 +46,23 @@ struct MessageListItemView: View {
         self.text = text
         self.callerRegenerateAction = {}
         self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
+        
+        // TODO: all these variable inits aren't reflected on first/initial draw, a lot of the time
+        self.responseGenerationElapsedTime = 0.0
+        if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
+            self.responseGenerationElapsedTime = Date.now.timeIntervalSince(self.responseFirstTokenAt!)
+        }
     }
     
     init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
         self.text = text
         self.callerRegenerateAction = regenerateAction
         self.isErrorViewVisible = hasErrorOccurred || errorMessage != nil
+        
+        self.responseGenerationElapsedTime = 0.0
+        if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
+            self.responseGenerationElapsedTime = Date.now.timeIntervalSince(self.responseFirstTokenAt!)
+        }
     }
     
     @State private var isHovered: Bool = false
@@ -97,35 +119,36 @@ struct MessageListItemView: View {
                 .visible(if: isRegenerateButtonVisible)
             }
             
-            if generationCompleteTime == nil {
-                if generationStartTime == nil {
-                    Text("start: nil")
+            // TODO: This is actually a very complex state machine.
+            //       We make do by doing a bunch of if checks.
+            if promptCreatedAt == nil {
+                if responseRequestedAt != nil && responseFirstTokenAt == nil && errorMessage == nil {
+                    Text(String(format: "requestedAt: \(asString(responseRequestedAt)), %.00f seconds ago", responseGenerationElapsedTime))
                         .foregroundStyle(.brown)
-                    Text("complete: nil")
-                        .foregroundStyle(.brown)
-                }
-                else {
-                    Text(String(format: "start: \(generationStartTime!.formatted(date: .numeric, time: .standard)), %.00f seconds ago", generationElapsedTime))
-                        .foregroundStyle(.brown)
-                        .onReceive(generationTimer) { currentTime in
-                            generationElapsedTime = currentTime.timeIntervalSince(generationStartTime!)
+                        .onReceive(responseGenerationTimer) { currentTime in
+                            responseGenerationElapsedTime = currentTime.timeIntervalSince(responseRequestedAt!)
                         }
-                    Text("complete: nil")
+                }
+                else {
+                    Text("requestedAt: \(asString(responseRequestedAt))")
                         .foregroundStyle(.brown)
                 }
-            }
-            else {
-                if generationStartTime == nil {
-                    Text("start: nil")
-                        .foregroundStyle(.brown)
-                    Text("complete: \(generationCompleteTime!.formatted(date: .numeric, time: .standard))")
+
+                if responseRequestedAt != nil && responseFirstTokenAt != nil {
+                    Text(String(format: "firstTokenAt: \(asString(responseFirstTokenAt)) — %.02f seconds elapsed since request", responseFirstTokenAt!.timeIntervalSince(responseRequestedAt!)))
                         .foregroundStyle(.brown)
                 }
                 else {
-                    Text("start: \(generationStartTime!.formatted(date: .numeric, time: .standard))")
+                    Text("firstTokenAt: \(asString(responseFirstTokenAt))")
                         .foregroundStyle(.brown)
-                    Text(
-                        String(format: "complete: \(generationCompleteTime!.formatted(date: .numeric, time: .standard)), %.02f seconds ago", generationCompleteTime!.timeIntervalSince(generationStartTime!)))
+                }
+                
+                if responseLastTokenAt != nil && responseRequestedAt != nil {
+                    Text(String(format: "lastTokenAt: \(asString(responseLastTokenAt)) — %.02f seconds elapsed since request", responseLastTokenAt!.timeIntervalSince(responseRequestedAt!)))
+                        .foregroundStyle(.brown)
+                }
+                else {
+                    Text("lastTokenAt: \(asString(responseLastTokenAt))")
                         .foregroundStyle(.brown)
                 }
             }
@@ -231,16 +254,29 @@ struct MessageListItemView: View {
         return view
     }
     
+    public func responseRequestedAt(_ responseRequestedAt: Date?) -> MessageListItemView {
+        var view = self
+        view.responseRequestedAt = responseRequestedAt
+
+        return view
+    }
+    
+    public func responseFirstTokenAt(_ responseFirstTokenAt: Date?) -> MessageListItemView {
+        var view = self
+        view.responseFirstTokenAt = responseFirstTokenAt
+
+        return view
+    }
+    
+    public func responseLastTokenAt(_ responseLastTokenAt: Date?) -> MessageListItemView {
+        var view = self
+        view.responseLastTokenAt = responseLastTokenAt
+
+        return view
+    }
+    
     public func generating(_ isGenerating: Bool) -> MessageListItemView {
         var view = self
-
-        if isGenerating {
-            view.generationStartTime = Date.now
-        }
-        else if !isGenerating {
-            view.generationCompleteTime = Date.now
-        }
-
         view.isGenerating = isGenerating
         
         return view

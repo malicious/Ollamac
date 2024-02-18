@@ -48,6 +48,7 @@ final class MessageViewModel {
         try? modelContext.saveChanges()
         
         if await ollamaKit.reachable() {
+            message.responseRequestedAt = Date.now
             let data = message.convertToOKGenerateRequestData()
             
             generation = ollamaKit.generate(data: data)
@@ -74,6 +75,9 @@ final class MessageViewModel {
         try? modelContext.saveChanges()
         
         if await ollamaKit.reachable() {
+            message.responseRequestedAt = Date.now
+            message.responseFirstTokenAt = nil
+            message.responseLastTokenAt = nil
             let data = message.convertToOKGenerateRequestData()
             
             generation = ollamaKit.generate(data: data)
@@ -95,6 +99,11 @@ final class MessageViewModel {
     func stopGenerate() {
         self.sendViewState = nil
         self.generation?.cancel()
+
+        // TODO: This will be confusing in the UI. The state of a message is actually very complex.
+        let lastIndex = self.messages.count - 1
+        self.messages[lastIndex].responseLastTokenAt = Date.now
+        
         try? self.modelContext.saveChanges()
     }
     
@@ -106,6 +115,10 @@ final class MessageViewModel {
         self.messages[lastIndex].context = response.context
         self.messages[lastIndex].response = lastMessageResponse + response.response
         
+        if self.messages[lastIndex].responseFirstTokenAt == nil {
+            self.messages[lastIndex].responseFirstTokenAt = Date.now
+        }
+        
         self.sendViewState = .loading
     }
     
@@ -115,6 +128,7 @@ final class MessageViewModel {
         let lastIndex = self.messages.count - 1
         self.messages[lastIndex].error = true
         self.messages[lastIndex].done = false
+        self.messages[lastIndex].responseLastTokenAt = Date.now
         
         try? self.modelContext.saveChanges()
         self.sendViewState = .error(message: errorMessage)
@@ -126,6 +140,7 @@ final class MessageViewModel {
         let lastIndex = self.messages.count - 1
         self.messages[lastIndex].error = false
         self.messages[lastIndex].done = true
+        self.messages[lastIndex].responseLastTokenAt = Date.now
         
         try? self.modelContext.saveChanges()
         self.sendViewState = nil
