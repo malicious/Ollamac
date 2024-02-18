@@ -34,7 +34,6 @@ struct MessageListItemView: View {
 
     private var errorMessage: String? = nil
     private var errorOccurredAt: Date? = nil
-    @State private var isErrorViewVisible: Bool
     
     // TODO: should be some kind of enum, if those can support "agent"/RP names
     private var roleName: String = "[unknown]"
@@ -45,8 +44,6 @@ struct MessageListItemView: View {
     init(_ text: MarkdownContent) {
         self.text = text
         self.callerRegenerateAction = {}
-        // TODO: all these variable inits aren't reflected on first/initial draw, a lot of the time
-        self._isErrorViewVisible = State(initialValue: errorMessage != nil)
         
         self.responseGenerationElapsedTime = 0.0
         if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
@@ -57,7 +54,6 @@ struct MessageListItemView: View {
     init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
         self.text = text
         self.callerRegenerateAction = regenerateAction
-        self._isErrorViewVisible = State(initialValue: errorMessage != nil)
         
         self.responseGenerationElapsedTime = 0.0
         if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
@@ -90,15 +86,6 @@ struct MessageListItemView: View {
 
                 Spacer()
                 
-                Button (action: errorAction) {
-                    Image(systemName: isErrorViewVisible ? "exclamationmark.circle.fill" : "exclamationmark.circle")
-                }
-                .buttonStyle(.accessoryBar)
-                .clipShape(.circle)
-                .help("Show error message")
-                .foregroundColor(.accentColor)
-                .visible(if: isHovered)
-
                 Button(action: copyAction) {
                     Image(systemName: isCopied ? "list.clipboard.fill" : "clipboard")
                 }
@@ -153,8 +140,9 @@ struct MessageListItemView: View {
                 }
             }
 
-            TextError(errorMessage ?? "[no error]")
-                .visible(if: isErrorViewVisible, removeCompletely: true)
+            if let errorMessage {
+                TextError(errorMessage)
+            }
 
             ProgressView()
                 .controlSize(.small)
@@ -209,15 +197,6 @@ struct MessageListItemView: View {
         .onHover {
             isHovered = $0
             isCopied = false
-        }
-    }
-    
-    // MARK: - Actions
-    private func errorAction() {
-        if isErrorViewVisible {
-            isErrorViewVisible = false
-        } else {
-            isErrorViewVisible = true
         }
     }
     
@@ -285,7 +264,6 @@ struct MessageListItemView: View {
         var view = self
         view.errorMessage = errorMessage
         view.errorOccurredAt = errorOccurredAt
-        view._isErrorViewVisible = State(initialValue: true)
         
         return view
     }
