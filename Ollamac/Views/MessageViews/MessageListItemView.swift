@@ -34,7 +34,7 @@ struct MessageListItemView: View {
 
     private var errorMessage: String? = nil
     private var errorOccurredAt: Date? = nil
-    @State private var isErrorViewVisible: Bool = false
+    @State private var isErrorViewVisible: Bool
     
     // TODO: should be some kind of enum, if those can support "agent"/RP names
     private var roleName: String = "[unknown]"
@@ -46,7 +46,7 @@ struct MessageListItemView: View {
         self.text = text
         self.callerRegenerateAction = {}
         // TODO: all these variable inits aren't reflected on first/initial draw, a lot of the time
-        self.isErrorViewVisible = errorMessage != nil
+        self._isErrorViewVisible = State(initialValue: errorMessage != nil)
         
         self.responseGenerationElapsedTime = 0.0
         if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
@@ -57,7 +57,7 @@ struct MessageListItemView: View {
     init(_ text: MarkdownContent, regenerateAction: @escaping () -> Void) {
         self.text = text
         self.callerRegenerateAction = regenerateAction
-        self.isErrorViewVisible = errorMessage != nil
+        self._isErrorViewVisible = State(initialValue: errorMessage != nil)
         
         self.responseGenerationElapsedTime = 0.0
         if self.responseFirstTokenAt != nil && self.responseLastTokenAt == nil {
@@ -285,8 +285,7 @@ struct MessageListItemView: View {
         var view = self
         view.errorMessage = errorMessage
         view.errorOccurredAt = errorOccurredAt
-        // TODO: Why does this sometimes not stick?
-        view.isErrorViewVisible = true
+        view._isErrorViewVisible = State(initialValue: true)
         
         return view
     }
