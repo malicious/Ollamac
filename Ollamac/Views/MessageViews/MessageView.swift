@@ -125,8 +125,15 @@ struct MessageView: View {
     private func regenerateAction(for message: Message) {
         guard messageViewModel.sendViewState.isNil || messageViewModel.sendViewState?.errorMessage != nil else { return }
         
-        message.context = []
         message.response = nil
+        message.responseRequestedAt = Date.now
+        message.responseFirstTokenAt = nil
+        message.responseLastTokenAt = nil
+        
+        message.context = []
+        message.done = false
+        message.errorMessage = nil
+        message.errorOccurredAt = nil
         
         let lastIndex = messageViewModel.messages.count - 1
         
