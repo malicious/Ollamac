@@ -34,7 +34,7 @@ struct OllamacApp: App {
         _commandViewModel = State(initialValue: commandViewModel)
         
         let ollamaURL = URL(string: "http://localhost:11434")!
-        let ollamaKit = OllamaKit(baseURL: ollamaURL, timeoutIntervalForRequest: 1.0)
+        let ollamaKit = OllamaKit(baseURL: ollamaURL)
                 
         let ollamaViewModel = OllamaViewModel(modelContext: modelContext, ollamaKit: ollamaKit)
         _ollamaViewModel = State(initialValue: ollamaViewModel)
