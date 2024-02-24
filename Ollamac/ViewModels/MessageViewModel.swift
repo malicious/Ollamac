@@ -108,6 +108,11 @@ final class MessageViewModel {
     }
     
     private func handleReceive(_ response: OKGenerateResponse) {
+        // DEBUG: dump tokens so we can figure out why spaces disappear sometimes
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+        print("[\(df.string(from: Date.now))] new token(s) -- \"\(response.response)\"")
+
         // This can happen if we get out of sync with the server; ignore it and move on.
         // TODO: Specifically, we don't close our Ollama connections, and can keep receiving data.
         if self.messages.isEmpty { return }
@@ -117,11 +122,11 @@ final class MessageViewModel {
             lastMessage.response = response.response
         }
         else {
-            // Need to add a space before subsequent responses
-            lastMessage.response = "\(lastMessage.response!) \(response.response)"
+            lastMessage.response = "\(lastMessage.response!)\(response.response)"
         }
 
         lastMessage.context = response.context
+
         if lastMessage.responseFirstTokenAt == nil {
             lastMessage.responseFirstTokenAt = Date.now
         }
