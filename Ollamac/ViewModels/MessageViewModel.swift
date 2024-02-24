@@ -108,17 +108,24 @@ final class MessageViewModel {
     }
     
     private func handleReceive(_ response: OKGenerateResponse) {
+        // This can happen if we get out of sync with the server; ignore it and move on.
+        // TODO: Specifically, we don't close our Ollama connections, and can keep receiving data.
         if self.messages.isEmpty { return }
-        
-        let lastIndex = self.messages.count - 1
-        let lastMessageResponse = self.messages[lastIndex].response ?? ""
-        self.messages[lastIndex].context = response.context
-        self.messages[lastIndex].response = lastMessageResponse + response.response
-        
-        if self.messages[lastIndex].responseFirstTokenAt == nil {
-            self.messages[lastIndex].responseFirstTokenAt = Date.now
+
+        let lastMessage = self.messages.last!
+        if lastMessage.response == nil {
+            lastMessage.response = response.response
         }
-        
+        else {
+            // Need to add a space before subsequent responses
+            lastMessage.response = "\(lastMessage.response!) \(response.response)"
+        }
+
+        lastMessage.context = response.context
+        if lastMessage.responseFirstTokenAt == nil {
+            lastMessage.responseFirstTokenAt = Date.now
+        }
+
         self.sendViewState = .loading
     }
     
