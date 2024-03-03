@@ -17,6 +17,7 @@ final class MessageViewModel {
     
     private var modelContext: ModelContext
     private var ollamaKit: OllamaKit
+    private var stayAwake: StayAwake?
     
     var messages: [Message] = []
     var sendViewState: ViewState? = nil
@@ -42,7 +43,11 @@ final class MessageViewModel {
     @MainActor
     func send(_ message: Message) async {
         self.sendViewState = .loading
-        
+        if self.stayAwake != nil {
+            print("DEBUG: trying to stay awake twice, ignoring")
+        }
+        self.stayAwake = try! StayAwake(reason: "OllamaKit send()")
+
         messages.append(message)
         modelContext.insert(message)
         try? modelContext.saveChanges()
@@ -70,6 +75,10 @@ final class MessageViewModel {
     @MainActor
     func regenerate(_ message: Message) async {
         self.sendViewState = .loading
+        if self.stayAwake != nil {
+            print("DEBUG: trying to stay awake twice, ignoring")
+        }
+        self.stayAwake = try! StayAwake(reason: "OllamaKit regenerate()")
         
         messages[messages.endIndex - 1] = message
         try? modelContext.saveChanges()
@@ -135,6 +144,7 @@ final class MessageViewModel {
     }
     
     private func handleError(_ errorMessage: String) {
+        self.stayAwake = nil
         if self.messages.isEmpty { return }
         
         let lastIndex = self.messages.count - 1
@@ -148,6 +158,7 @@ final class MessageViewModel {
     }
     
     private func handleComplete() {
+        self.stayAwake = nil
         if self.messages.isEmpty { return }
         
         let lastIndex = self.messages.count - 1

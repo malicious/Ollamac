@@ -33,6 +33,7 @@
 		0ACA4D762AF89C27000DA76F /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0ACA4D752AF89C27000DA76F /* MarkdownUI */; };
 		0ACA4D822AF948C4000DA76F /* AppMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACA4D812AF948C4000DA76F /* AppMessages.swift */; };
 		0ACA4D842AF94A9C000DA76F /* ChatContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACA4D832AF94A9C000DA76F /* ChatContextMenu.swift */; };
+		CE1D7DFF2B94FD9800885C4B /* StayAwake.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */; };
 		CE7C37072B77E084002C45BA /* OllamaKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE7C37062B77E084002C45BA /* OllamaKit */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 		0ACA4D812AF948C4000DA76F /* AppMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMessages.swift; sourceTree = "<group>"; };
 		0ACA4D832AF94A9C000DA76F /* ChatContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatContextMenu.swift; sourceTree = "<group>"; };
 		0AE024842AFB8D0E00347C18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StayAwake.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				0ACA4D812AF948C4000DA76F /* AppMessages.swift */,
+				CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -308,6 +311,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE1D7DFF2B94FD9800885C4B /* StayAwake.swift in Sources */,
 				0A4D35BA2AF563BE00846890 /* Chat.swift in Sources */,
 				0A4D359F2AF5429500846890 /* OllamaModel.swift in Sources */,
 				0A4D35B62AF562CB00846890 /* MessageViewModel.swift in Sources */,
