@@ -5,13 +5,9 @@
 //  Created by Kevin Hermawan on 04/11/23.
 //
 
-import Foundation
 import MarkdownUI
-import PythonKit
 import SwiftUI
 import ViewCondition
-
-let sys = Python.import("sys")
 
 private func asString(_ d: Date?) -> String {
     if d == nil {
@@ -148,7 +144,7 @@ struct MessageListItemView: View {
                 }
             }
             
-            let tokenCountInfo = computeTokenCountInfo(text.renderPlainText())
+            let tokenCountInfo = countTokens(in: text.renderPlainText())
             if tokenCountInfo != nil {
                 Text(tokenCountInfo!)
                     .foregroundStyle(.brown)
@@ -224,27 +220,13 @@ struct MessageListItemView: View {
         return "estimated token count: \(tokenEstimate)"
     }
 
-    func computeTokenCountInfo(_ text: String) -> String? {
-        do {
-            // print("Python Version: \(sys.version)")
-            
-            // https://stackoverflow.com/questions/72294775/how-do-i-know-how-much-tokens-a-gpt-3-request-used
-            // TODO: Consider `tiktoken` as well
-            // TODO: If we're going to embed this, note that we need to pre-run this and download the GPT2 tokenizer files
-            // TODO: This should be retained in memory, but we should confirm that it actually is
-            let transformers = try Python.attemptImport("transformers")
-
-            let os = Python.import("os")
-            os.environ["HF_HUB_OFFLINE"] = 1
-            
-            let tokenizer = transformers.GPT2TokenizerFast.from_pretrained("gpt2", local_files_first: true)
-            let tokens = tokenizer(text)["input_ids"]
-            
-            return "tokenizer-estimated token count: \(tokens.count)"
-        } catch {
-            print("failed to tokenize message text with length \(text.count)")
-            return estimateTokenCount_chars(text)
+    func countTokens(in text: String) -> String? {
+        let accurateCount = computeTokenCount(text)
+        if accurateCount != nil {
+            return "tokenizer-estimated token count: \(accurateCount!)"
         }
+
+        return estimateTokenCount_chars(text)
     }
     
     private func copyAction() {

@@ -36,6 +36,7 @@
 		CE1D7DFF2B94FD9800885C4B /* StayAwake.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */; };
 		CE7C37072B77E084002C45BA /* OllamaKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE7C37062B77E084002C45BA /* OllamaKit */; };
 		CEAE79C72B9A29FF00B87705 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = CEAE79C62B9A29FF00B87705 /* PythonKit */; };
+		CEAE79C92B9A49F000B87705 /* PythonTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAE79C82B9A49F000B87705 /* PythonTokenizer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,7 @@
 		0ACA4D832AF94A9C000DA76F /* ChatContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatContextMenu.swift; sourceTree = "<group>"; };
 		0AE024842AFB8D0E00347C18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StayAwake.swift; sourceTree = "<group>"; };
+		CEAE79C82B9A49F000B87705 /* PythonTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PythonTokenizer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +189,7 @@
 			children = (
 				0ACA4D812AF948C4000DA76F /* AppMessages.swift */,
 				CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */,
+				CEAE79C82B9A49F000B87705 /* PythonTokenizer.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				0ACA4D4E2AF799A1000DA76F /* RenameChatView.swift in Sources */,
 				0ACA4D512AF7A34D000DA76F /* ModelContext+SaveChanges.swift in Sources */,
 				0AB5F2982B0B9C340040B72E /* TextError.swift in Sources */,
+				CEAE79C92B9A49F000B87705 /* PythonTokenizer.swift in Sources */,
 				0A4D35B82AF5630600846890 /* Message.swift in Sources */,
 				0A4D35C22AF56FD500846890 /* AddChatView.swift in Sources */,
 				0A4D35C62AF57D8800846890 /* MessageListItemView.swift in Sources */,
