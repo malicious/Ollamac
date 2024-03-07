@@ -35,6 +35,7 @@
 		0ACA4D842AF94A9C000DA76F /* ChatContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACA4D832AF94A9C000DA76F /* ChatContextMenu.swift */; };
 		CE1D7DFF2B94FD9800885C4B /* StayAwake.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1D7DFE2B94FD9800885C4B /* StayAwake.swift */; };
 		CE7C37072B77E084002C45BA /* OllamaKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE7C37062B77E084002C45BA /* OllamaKit */; };
+		CEAE79C72B9A29FF00B87705 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = CEAE79C62B9A29FF00B87705 /* PythonKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +76,7 @@
 				0ACA4D732AF88DB6000DA76F /* ViewCondition in Frameworks */,
 				0AB30EB22B272A67009C038A /* ChatField in Frameworks */,
 				0ACA4D5E2AF7AC43000DA76F /* SwiftUIIntrospect in Frameworks */,
+				CEAE79C72B9A29FF00B87705 /* PythonKit in Frameworks */,
 				CE7C37072B77E084002C45BA /* OllamaKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -248,6 +250,7 @@
 				0ACA4D752AF89C27000DA76F /* MarkdownUI */,
 				0AB30EB12B272A67009C038A /* ChatField */,
 				CE7C37062B77E084002C45BA /* OllamaKit */,
+				CEAE79C62B9A29FF00B87705 /* PythonKit */,
 			);
 			productName = Ollamac;
 			productReference = 0A4D35812AF541D900846890 /* Ollamac.app */;
@@ -284,6 +287,7 @@
 				0ACA4D742AF89C27000DA76F /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				0AB30EB02B272A67009C038A /* XCRemoteSwiftPackageReference "ChatField" */,
 				CE993CE22B76D050006260DC /* XCLocalSwiftPackageReference "../OllamaKit" */,
+				CEAE79C52B9A29FF00B87705 /* XCRemoteSwiftPackageReference "PythonKit" */,
 			);
 			productRefGroup = 0A4D35822AF541D900846890 /* Products */;
 			projectDirPath = "";
@@ -594,6 +598,14 @@
 				minimumVersion = 2.2.0;
 			};
 		};
+		CEAE79C52B9A29FF00B87705 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pvieito/PythonKit";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -626,6 +638,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CE993CE22B76D050006260DC /* XCLocalSwiftPackageReference "../OllamaKit" */;
 			productName = OllamaKit;
+		};
+		CEAE79C62B9A29FF00B87705 /* PythonKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEAE79C52B9A29FF00B87705 /* XCRemoteSwiftPackageReference "PythonKit" */;
+			productName = PythonKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
