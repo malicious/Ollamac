@@ -28,7 +28,7 @@ final class Message: Identifiable {
     var errorOccurredAt: Date? = nil
     
     @Relationship var chat: Chat?
-        
+
     init(prompt: String?, response: String?) {
         self.prompt = prompt
         self.response = response

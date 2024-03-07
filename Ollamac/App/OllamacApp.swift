@@ -6,6 +6,7 @@
 //
 
 import OllamaKit
+import PythonKit
 import SwiftUI
 import SwiftData
 
@@ -44,6 +45,11 @@ struct OllamacApp: App {
         
         let chatViewModel = ChatViewModel(modelContext: modelContext)
         _chatViewModel = State(initialValue: chatViewModel)
+        
+        // TODO: Rather than rely on system Python, or this hard-coded path,
+        //       embed a version of https://github.com/beeware/Python-Apple-support
+        let sys = Python.import("sys")
+        sys.path.append("/Users/user/Development/venv-ollamac/lib/python3.12/site-packages")
     }
     
     var body: some Scene {
