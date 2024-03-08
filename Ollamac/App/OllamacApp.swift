@@ -45,7 +45,8 @@ struct OllamacApp: App {
         let chatViewModel = ChatViewModel(modelContext: modelContext)
         _chatViewModel = State(initialValue: chatViewModel)
         
-        configureTokenizerPython()
+        // Disable init until we can package Python or figure out how to do this cross-system
+        //configureTokenizerPython()
     }
     
     var body: some Scene {
