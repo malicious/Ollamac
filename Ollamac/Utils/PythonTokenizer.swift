@@ -14,7 +14,7 @@ func configureTokenizerPython(from_pretrained pretrained_model_name_or_path: Str
     do {
         // TODO: Rather than rely on system Python, or this hard-coded path,
         //       embed a version of https://github.com/beeware/Python-Apple-support
-        let sys = try Python.import("sys")
+        let sys = try Python.attemptImport("sys")
         sys.path.append("/Users/user/Development/venv-ollamac/lib/python3.12/site-packages")
         print("Python Version: \(sys.version)")
     } catch {
