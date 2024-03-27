@@ -34,6 +34,31 @@ struct MessageView: View {
     }
     
     var body: some View {
+        let modelName = chat.model!.name
+        let model = ollamaViewModel.models.first(where: {
+            $0.name == modelName
+        })
+
+        VStack(alignment: .leading, spacing: 8) {
+            if let parameters = model?.modelParameters {
+                Text("Parameters")
+                    .font(.title3)
+                Text(parameters)
+                    .padding([.leading], 8)
+            }
+
+            Text("Prompt template")
+                .font(.title3)
+            Text(model?.promptTemplate ?? "[no prompt template]")
+                .padding([.leading], 8)
+
+            Text("System prompt")
+                .font(.title3)
+            Text(model?.systemPrompt ?? "[no system prompt]")
+                .padding([.leading], 8)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
         ScrollViewReader { scrollViewProxy in
             List(messageViewModel.messages.indices, id: \.self) { index in
                 let message = messageViewModel.messages[index]
@@ -103,7 +128,7 @@ struct MessageView: View {
     // MARK: - Actions
     private func initAction() {
         try? messageViewModel.fetch(for: chat)
-        
+
         promptFocused = true
     }
     
