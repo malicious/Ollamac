@@ -17,9 +17,10 @@ struct OllamacApp: App {
     @State private var messageViewModel: MessageViewModel
     
     var sharedModelContainer: ModelContainer = {
+        let storeURL = URL.applicationSupportDirectory.appending(path: "ollamac.sqlite")
         let schema = Schema([Chat.self, Message.self, OllamaModel.self])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        
+        let modelConfiguration = ModelConfiguration(schema: schema, url: storeURL)
+
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
