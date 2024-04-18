@@ -8,45 +8,46 @@
 import SwiftUI
 import ViewCondition
 
+
+fileprivate func dateToString(_ date: Date) -> String {
+    // TODO: Do we truly _need_ these new objects, every time?
+    let calendar = Calendar.current
+    let chatDate = calendar.startOfDay(for: date)
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+
+    return dateFormatter.string(from: chatDate)
+}
+
+
 struct ChatSidebarListView: View {
     @Environment(CommandViewModel.self) private var commandViewModel
     @Environment(ChatViewModel.self) private var chatViewModel
     
-    private var todayChats: [Chat] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        
-        return chatViewModel.chats.filter {
-            calendar.isDate($0.modifiedAt, inSameDayAs: today)
+    private var sectionsAndChats: [(String, [Chat])] {
+        var result: [String: [Chat]] = [:]
+
+        for chat in chatViewModel.chats {
+            let chatDateString = dateToString(chat.modifiedAt)
+
+            var chatsByDate = result[chatDateString] ?? []
+            chatsByDate.append(chat)
+
+            result[chatDateString] = chatsByDate
         }
-    }
-    
-    private var yesterdayChats: [Chat] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-        
-        return chatViewModel.chats.filter {
-            calendar.isDate($0.modifiedAt, inSameDayAs: yesterday)
-        }
-    }
-    
-    private var previousDays: [Chat] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-        
-        return chatViewModel.chats.filter {
-            !calendar.isDate($0.modifiedAt, inSameDayAs: today) && !calendar.isDate($0.modifiedAt, inSameDayAs: yesterday)
-        }
+
+        return result.map({key, value in (key, value)})
     }
     
     var body: some View {
         @Bindable var commandViewModelBindable = commandViewModel
         
-        List(selection: $commandViewModelBindable.selectedChat) {
-            Section(header: Text("Today")) {
-                ForEach(todayChats) { chat in
+        List(sectionsAndChats, id: \.0, selection:$commandViewModelBindable.selectedChat) { pair in
+            let (sectionName, chats) = pair
+
+            Section(header: Text(sectionName)) {
+                ForEach(chats) { chat in
                     Label(chat.name, systemImage: "bubble")
                         .contextMenu {
                             ChatContextMenu(commandViewModel, for: chat)
@@ -54,29 +55,6 @@ struct ChatSidebarListView: View {
                         .tag(chat)
                 }
             }
-            .hide(if: todayChats.isEmpty, removeCompletely: true)
-            
-            Section(header: Text("Yesterday")) {
-                ForEach(yesterdayChats) { chat in
-                    Label(chat.name, systemImage: "bubble")
-                        .contextMenu {
-                            ChatContextMenu(commandViewModel, for: chat)
-                        }
-                        .tag(chat)
-                }
-            }
-            .hide(if: yesterdayChats.isEmpty, removeCompletely: true)
-            
-            Section(header: Text("Previous Days")) {
-                ForEach(previousDays) { chat in
-                    Label(chat.name, systemImage: "bubble")
-                        .contextMenu {
-                            ChatContextMenu(commandViewModel, for: chat)
-                        }
-                        .tag(chat)
-                }
-            }
-            .hide(if: previousDays.isEmpty, removeCompletely: true)
         }
         .listStyle(.sidebar)
         .task {
