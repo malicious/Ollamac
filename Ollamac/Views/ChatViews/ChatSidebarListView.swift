@@ -10,14 +10,30 @@ import ViewCondition
 
 
 fileprivate func dateToString(_ date: Date) -> String {
-    // TODO: Do we truly _need_ these new objects, every time?
-    let calendar = Calendar.current
+    let calendar = Calendar(identifier: .iso8601)
     let chatDate = calendar.startOfDay(for: date)
 
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd"
 
     return dateFormatter.string(from: chatDate)
+}
+
+
+func dateToISOString(_ date: Date) -> String {
+    let calendar = Calendar(identifier: .iso8601)
+    // Manually fetch the day-of-week, because dateFormat 'e' counts days from Sunday and is off by one.
+    let components = calendar.dateComponents([.weekdayOrdinal], from: date)
+
+    let formatter = DateFormatter()
+    // en_US_POSIX is specifically designed to return fixed format, English dates
+    // https://developer.apple.com/library/archive/qa/qa1480/_index.html
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(abbreviation: "UTC")
+    formatter.dateFormat = "YYYY-'ww'ww.e-LLL-dd"
+    formatter.dateFormat = "YYYY-'ww'ww.'\(components.weekdayOrdinal! + 1)'-LLL-dd"
+
+    return formatter.string(from: date)
 }
 
 
@@ -29,7 +45,7 @@ struct ChatSidebarListView: View {
         var result: [String: [Chat]] = [:]
 
         for chat in chatViewModel.chats {
-            let chatDateString = dateToString(chat.modifiedAt)
+            let chatDateString = dateToISOString(chat.modifiedAt)
 
             var chatsByDate = result[chatDateString] ?? []
             chatsByDate.append(chat)
