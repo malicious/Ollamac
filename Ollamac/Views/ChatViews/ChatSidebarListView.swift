@@ -54,21 +54,10 @@ struct ChatSidebarListView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
     
     private var sortedSectionNamesAndChats: [(String, [Chat])] {
-        var result: [String: [Chat]] = [:]
-
-        for chat in chatViewModel.chats {
-            let sectionName = dateToSectionName(chat.modifiedAt)
-
-            var chatsByDate = result[sectionName] ?? []
-            chatsByDate.append(chat)
-
-            // Keep the array of chats always-sorted, as well.
-            // This is big-O expensive, but the number of chats is expected to be low.
-            result[sectionName] = chatsByDate.sorted { $0.modifiedAt < $1.modifiedAt }
-        }
-
-        // Sort the results before returning them
-        return result.sorted { $0.key < $1.key }
+        let sectionedChats = Dictionary(grouping: chatViewModel.chats) { dateToSectionName($0.modifiedAt) }
+        return Array(sectionedChats)
+            .map { ($0.0, $0.1.sorted(by: { $0.modifiedAt > $1.modifiedAt })) }
+            .sorted { $0.0 > $1.0 }
     }
 
     var body: some View {
