@@ -41,8 +41,14 @@ func dateToSectionName(_ date: Date) -> String {
     let sectionName = dateToISOString(date)
 
     // If the date was more than a week ago, just return the week-name
-    if date.timeIntervalSinceNow < 168 * 24 * 3600 {
+    if date.timeIntervalSinceNow < -168 * 24 * 3600 {
         return String(sectionName.prefix(9))
+    }
+    
+    // If it's in the previous week, truncate so it's just the week-name
+    let todaySection = dateToISOString(Date.now)
+    if todaySection.prefix(9) != sectionName.prefix(9) {
+        return String(todaySection.prefix(9))
     }
 
     return sectionName
