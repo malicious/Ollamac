@@ -37,29 +37,44 @@ func dateToISOString(_ date: Date) -> String {
 }
 
 
+func dateToSectionName(_ date: Date) -> String {
+    let sectionName = dateToISOString(date)
+
+    // If the date was more than a week ago, just return the week-name
+    if date.timeIntervalSinceNow < 168 * 24 * 3600 {
+        return String(sectionName.prefix(9))
+    }
+
+    return sectionName
+}
+
+
 struct ChatSidebarListView: View {
     @Environment(CommandViewModel.self) private var commandViewModel
     @Environment(ChatViewModel.self) private var chatViewModel
     
-    private var sectionsAndChats: [(String, [Chat])] {
+    private var sortedSectionNamesAndChats: [(String, [Chat])] {
         var result: [String: [Chat]] = [:]
 
         for chat in chatViewModel.chats {
-            let chatDateString = dateToISOString(chat.modifiedAt)
+            let sectionName = dateToSectionName(chat.modifiedAt)
 
-            var chatsByDate = result[chatDateString] ?? []
+            var chatsByDate = result[sectionName] ?? []
             chatsByDate.append(chat)
 
-            result[chatDateString] = chatsByDate
+            // Keep the array of chats always-sorted, as well.
+            // This is big-O expensive, but the number of chats is expected to be low.
+            result[sectionName] = chatsByDate.sorted { $0.modifiedAt < $1.modifiedAt }
         }
 
-        return result.map({key, value in (key, value)})
+        // Sort the results before returning them
+        return result.sorted { $0.key < $1.key }
     }
-    
+
     var body: some View {
         @Bindable var commandViewModelBindable = commandViewModel
         
-        List(sectionsAndChats, id: \.0, selection:$commandViewModelBindable.selectedChat) { pair in
+        List(sortedSectionNamesAndChats, id: \.0, selection:$commandViewModelBindable.selectedChat) { pair in
             let (sectionName, chats) = pair
 
             Section(header: Text(sectionName)) {
