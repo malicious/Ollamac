@@ -58,6 +58,7 @@ struct MessageView: View {
                 .padding([.leading], 8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
 
         ScrollViewReader { scrollViewProxy in
             List(messageViewModel.messages.indices, id: \.self) { index in
