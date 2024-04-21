@@ -47,8 +47,8 @@ func dateToSectionName(_ date: Date) -> String {
     
     // If it's in the previous week, truncate so it's just the week-name
     let todaySection = dateToISOString(Date.now)
-    if todaySection.prefix(9) != sectionName.prefix(9) {
-        return String(todaySection.prefix(9))
+    if sectionName.prefix(9) != todaySection.prefix(9) {
+        return String(sectionName.prefix(9))
     }
 
     return sectionName
