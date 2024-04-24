@@ -20,33 +20,58 @@ fileprivate func dateToString(_ date: Date) -> String {
 }
 
 
-func dateToISOString(_ date: Date) -> String {
-    let calendar = Calendar(identifier: .iso8601)
-    // Manually fetch the day-of-week, because dateFormat 'e' counts days from Sunday and is off by one.
-    let components = calendar.dateComponents([.weekdayOrdinal], from: date)
-
+fileprivate func dateToISOWeek(_ date: Date) -> String {
     let formatter = DateFormatter()
     // en_US_POSIX is specifically designed to return fixed format, English dates
     // https://developer.apple.com/library/archive/qa/qa1480/_index.html
     formatter.locale = Locale(identifier: "en_US_POSIX")
     formatter.timeZone = TimeZone(abbreviation: "UTC")
     formatter.dateFormat = "YYYY-'ww'ww.e-LLL-dd"
-    formatter.dateFormat = "YYYY-'ww'ww.'\(components.weekdayOrdinal! + 1)'-LLL-dd"
 
     return formatter.string(from: date)
 }
 
 
+fileprivate func dateToISOWeekStartingMonday(_ date: Date) -> String {
+    // Manually fetch the day-of-week, because dateFormat 'e' counts days from Sunday.
+    let calendar = Calendar(identifier: .iso8601)
+    let components = calendar.dateComponents(
+        [.yearForWeekOfYear, .weekOfYear, .weekday, .month, .day], from: date)
+
+    var paddedYear = String(format: "%04d", components.yearForWeekOfYear!)
+    var paddedWeek = String(format: "%02d", components.weekOfYear!)
+    var weekday = components.weekday! - 1
+
+    // For Sundays, we need to bump everything back by one.
+    if weekday == 0 {
+        let yesterdayComponents = calendar.dateComponents(
+            [.yearForWeekOfYear, .weekOfYear],
+            from: calendar.date(byAdding: .day, value: -1, to: date)!)
+        paddedYear = String(format: "%04d", yesterdayComponents.yearForWeekOfYear!)
+        paddedWeek = String(format: "%02d", yesterdayComponents.weekOfYear!)
+        weekday = 7
+    }
+
+    // We need a DateFormatter to get month name(s).
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(abbreviation: "UTC")
+
+    formatter.dateFormat = "'-'LLL'-'dd"
+    return "\(paddedYear)-ww\(paddedWeek).\(weekday)" + formatter.string(from: date)
+}
+
+
 func dateToSectionName(_ date: Date) -> String {
-    let sectionName = dateToISOString(date)
+    let sectionName = dateToISOWeekStartingMonday(date)
 
     // If the date was more than a week ago, just return the week-name
     if date.timeIntervalSinceNow < -168 * 24 * 3600 {
         return String(sectionName.prefix(9))
     }
-    
+
     // If it's in the previous week, truncate so it's just the week-name
-    let todaySection = dateToISOString(Date.now)
+    let todaySection = dateToISOWeekStartingMonday(Date.now)
     if sectionName.prefix(9) != todaySection.prefix(9) {
         return String(sectionName.prefix(9))
     }
