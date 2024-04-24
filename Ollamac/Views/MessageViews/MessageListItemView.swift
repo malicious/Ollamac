@@ -217,7 +217,7 @@ struct MessageListItemView: View {
     private func estimateTokenCount_chars(_ text: String) -> String? {
         let charCount = text.count
         let tokenEstimate = Float(charCount - 2) * exp(-1)
-        return "estimated token count: \(tokenEstimate)"
+        return "estimated token count: " + String(format: "%.2f", tokenEstimate)
     }
 
     func countTokens(in text: String) -> String? {
