@@ -63,6 +63,26 @@ final class OllamaViewModel {
         model.modelParameters = modelInfo.parameters
         model.promptTemplate = modelInfo.template
         model.systemPrompt = modelInfo.system
+        
+        _ = tryAddModelRecord(modelInfo: modelInfo)
+    }
+    
+    private func fetchLatestModelInfo(modelName: String) -> OllamaModelRecord? {
+        return nil
+    }
+
+    private func tryAddModelRecord(modelInfo: OKModelInfoResponse) -> OllamaModelRecord? {
+//        let existingModels: Set<Model> = []
+//        for model in ModelContext.shared.fetchAllModels() {
+//            existingModels.insert(model)
+//        }
+//
+//        if existingModels.contains(where: { $0.data == newModel.data }) {
+//            // Model already exists with similar data
+//        } else {
+//            // Add the new model to the context
+//        }
+        return nil
     }
 
     private func fetchFromRemote() async throws -> [OKModelResponse.Model] {

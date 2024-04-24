@@ -28,6 +28,7 @@ final class Message: Identifiable {
     var errorOccurredAt: Date? = nil
     
     @Relationship var chat: Chat?
+    var modelRecord: OllamaModelRecord?
 
     init(prompt: String?, response: String?) {
         self.prompt = prompt

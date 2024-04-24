@@ -18,6 +18,8 @@ final class Chat: Identifiable {
 
     @Relationship
     var model: OllamaModel?
+    
+    var initialModelRecord: OllamaModelRecord? = nil
 
     @Relationship(deleteRule: .cascade, inverse: \Message.chat)
     var messages: [Message] = []
