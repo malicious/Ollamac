@@ -8,6 +8,17 @@
 import Foundation
 import SwiftData
 
+struct ModelInfoPair: Identifiable, Codable {
+    let id = UUID()
+    let description: String
+    let content: String
+    
+    init(description: String, content: String) {
+        self.description = description
+        self.content = content
+    }
+}
+
 @Model
 final class Chat: Identifiable {
     @Attribute(.unique) var id: UUID = UUID()
@@ -18,8 +29,8 @@ final class Chat: Identifiable {
 
     @Relationship
     var model: OllamaModel?
-    
-    var initialModelRecord: OllamaModelRecord? = nil
+
+    @Transient var modelInfo: [ModelInfoPair] = []
 
     @Relationship(deleteRule: .cascade, inverse: \Message.chat)
     var messages: [Message] = []
