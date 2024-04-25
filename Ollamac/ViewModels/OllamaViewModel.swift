@@ -36,6 +36,7 @@ final class OllamaViewModel {
                 model.isAvailable = true
                 do {
                     try await populateInfo(model)
+                    try await populateRawInfo(model.name)
                 }
                 catch {}
             } else {
@@ -48,6 +49,7 @@ final class OllamaViewModel {
             model.isAvailable = true
             do {
                 try await populateInfo(model)
+                try await populateRawInfo(model.name)
             }
             catch {}
 
@@ -59,12 +61,17 @@ final class OllamaViewModel {
     }
     
     func populateInfo(_ model: OllamaModel) async throws {
-        let modelInfo = try await ollamaKit.modelInfo(data: OKModelInfoRequestData(name: model.name))
+        let modelInfo: OKModelInfoResponse = try await ollamaKit.modelInfo(data: OKModelInfoRequestData(name: model.name))
         model.modelParameters = modelInfo.parameters
         model.promptTemplate = modelInfo.template
         model.systemPrompt = modelInfo.system
         
         _ = tryAddModelRecord(modelInfo: modelInfo)
+    }
+    
+    func populateRawInfo(_ modelName: String) async throws {
+        let rawModelInfoResponse = try await ollamaKit.rawModelInfo(data: OKModelInfoRequestData(name: modelName))
+        print(String(data: rawModelInfoResponse, encoding: .utf8))
     }
     
     private func fetchLatestModelInfo(modelName: String) -> OllamaModelRecord? {
