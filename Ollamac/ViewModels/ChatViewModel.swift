@@ -48,14 +48,29 @@ final class ChatViewModel {
                 description: "Entire info blob",
                 content: infoString))
 
-            // Parse the raw data into appropriate JSON
-            let decoder = JSONDecoder()
-            let decodedInfo = try decoder.decode([ModelInfoPair].self, from: targetRecord.data)
-            for pair in decodedInfo {
-                chat.modelInfo.append(pair)
-            }
+//            // Parse the raw data into appropriate JSON
+//            var jsonDict = try JSONSerialization.jsonObject(with: targetRecord.data, options: []) as! [String: Any]
+//            jsonDict.removeValue(forKey: "modelfile")
+//
+//            jsonDict.forEach { (key, value) in
+//                var valueAsString = "[failed to re-encode]"
+//
+//                do {
+//                    let reencoded = try JSONSerialization.data(withJSONObject: value, options: [])
+//                    if let reencodedAsString = String(data: reencoded, encoding: .utf8) {
+//                        valueAsString = reencodedAsString
+//                    }
+//                }
+//                catch {
+//                    print("[ERROR] Failed to re-encode JSON value for \(key)")
+//                }
+//
+//                chat.modelInfo.append(ModelInfoPair(description: key, content: valueAsString))
+//            }
         }
-        catch {}
+        catch {
+            print("[WARNING] Failed to populate model info for \(chat.model?.name ?? "[no model name]")")
+        }
     }
 
     func fetch() throws {
