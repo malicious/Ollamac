@@ -65,8 +65,7 @@ extension OllamaModelRecord {
         }
 
         jsonDict.forEach { (key, value) in
-//            print("[INFO] \(key) => \(value)")
-            var encodedValueAsString = "[failed to re-encode]"
+            var encodedValueAsString = "[failed to re-encode JSON value]"
 
             do {
                 if let valueAsString = value as? String {
@@ -86,6 +85,6 @@ extension OllamaModelRecord {
             resultModelInfo.append(ModelInfoPair(description: key, content: encodedValueAsString))
         }
 
-        return resultModelInfo
+        return resultModelInfo.sorted { $0.description < $1.description }
     }
 }

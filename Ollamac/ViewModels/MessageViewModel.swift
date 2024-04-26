@@ -30,7 +30,7 @@ final class MessageViewModel {
     deinit {
         self.stopGenerate()
     }
-    
+
     func fetch(for chat: Chat) throws {
         let chatId = chat.id
         let predicate = #Predicate<Message>{ $0.chat?.id == chatId }
@@ -39,7 +39,7 @@ final class MessageViewModel {
         
         messages = try modelContext.fetch(fetchDescriptor)
     }
-    
+
     @MainActor
     func send(_ message: Message) async {
         self.sendViewState = .loading

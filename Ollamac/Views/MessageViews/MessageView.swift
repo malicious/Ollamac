@@ -35,7 +35,7 @@ struct MessageView: View {
 
     var body: some View {
         ScrollViewReader { scrollViewProxy in
-            if !chat.modelInfo.isEmpty {
+            if chat.hasModelInfo {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(chat.modelInfo) { pair in
                         Text(pair.description)

@@ -46,9 +46,14 @@ final class OllamaViewModel {
             self.modelContext.insert(model)
 
             // Capture + persist raw model info record
-            if let rawModelInfo = await fetchRawModelInfo(newModel.name) {
-                _ = tryAddModelRecord(newModel.name, data: rawModelInfo)
+            do {
+                if let rawModelInfo = try await fetchRawModelInfo(newModel.name) {
+                    if let newModelRecord = try addModelRecord(newModel.name, data: rawModelInfo) {
+                        modelContext.insert(newModelRecord)
+                    }
+                }
             }
+            catch {}
         }
 
         try self.modelContext.saveChanges()
@@ -57,34 +62,22 @@ final class OllamaViewModel {
         models = try self.fetchFromLocal()
     }
 
-    private func fetchRawModelInfo(_ modelName: String) async -> Data? {
-        do {
-            return try await ollamaKit.rawModelInfo(data: OKModelInfoRequestData(name: modelName))
-        }
-        catch {
-            return nil
-        }
+    private func fetchRawModelInfo(_ modelName: String) async throws -> Data? {
+        return try await ollamaKit.rawModelInfo(data: OKModelInfoRequestData(name: modelName))
     }
 
-    private func tryAddModelRecord(_ name: String, data rawModelInfo: Data) -> OllamaModelRecord? {
+    private func addModelRecord(_ name: String, data rawModelInfo: Data) throws -> OllamaModelRecord? {
         let fetchDescriptor = FetchDescriptor<OllamaModelRecord>(
             sortBy: [SortDescriptor(\OllamaModelRecord.createdAt),
                      SortDescriptor(\OllamaModelRecord.modelName)])
 
-        var returnedModel: OllamaModelRecord? = nil
-        do {
-            let existingModels = try modelContext.fetch(fetchDescriptor)
-            if existingModels.contains(where: { $0.data == rawModelInfo }) {
-//                print("[DEBUG] model + identical data already exists, returning nil")
-                returnedModel = nil
-            } else {
-                returnedModel = OllamaModelRecord(name: name, data: rawModelInfo)
-                modelContext.insert(returnedModel!)
-            }
+        let existingRecords = try modelContext.fetch(fetchDescriptor)
+        if existingRecords.contains(where: { $0.data == rawModelInfo }) {
+            return nil
         }
-        catch {}
 
-        return returnedModel
+        print("[DEBUG] updated modelRecord + parameters for: \(name)")
+        return OllamaModelRecord(name: name, data: rawModelInfo)
     }
 
     private func fetchFromRemote() async throws -> [OKModelResponse.Model] {

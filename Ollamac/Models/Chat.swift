@@ -20,7 +20,7 @@ final class Chat: Identifiable {
     var model: OllamaModel?
 
     @Transient
-    var modelRecord: OllamaModelRecord?
+    var modelRecord: OllamaModelRecord? = nil
 
     @Relationship(deleteRule: .cascade, inverse: \Message.chat)
     var messages: [Message] = []
@@ -28,11 +28,11 @@ final class Chat: Identifiable {
     init(name: String) {
         self.name = name
     }
-    
+
     var hasModelInfo: Bool {
         return modelRecord != nil
     }
-    
+
     var modelInfo: [ModelInfoPair] {
         guard modelRecord != nil else { return [] }
         return modelRecord!.asModelInfoPairs()
