@@ -20,27 +20,21 @@ final class ChatViewModel {
     }
     
     private func tryPopulateModelInfo(_ chat: Chat) {
-        // TODO: We have to actually provide a predicate
-//        let predicate = #Predicate<OllamaModelRecord>{ $0.modelName == chat.name }
+        // Find any record that matches the Ollama model name.
+        // Don't bother with `createdAt` or `modifiedAt`, since we'd need to embed that info into the chat's messages to be useful.
+        let targetModelName = chat.model?.name ?? ""
+        let predicate = #Predicate<OllamaModelRecord>{ $0.modelName == targetModelName }
         let fetchDescriptor = FetchDescriptor<OllamaModelRecord>(
-//            predicate: predicate,
+            predicate: predicate,
             sortBy: [SortDescriptor(\OllamaModelRecord.createdAt)]
         )
 
         do {
-            // TODO: We only need one record. Also, make sure it's the most recent, not the least recent.
-            var targetRecord: OllamaModelRecord? = nil
-
             let allRecords = try modelContext.fetch(fetchDescriptor)
-            for testRecord in allRecords {
-                if testRecord.modelName == chat.model?.name {
-                    targetRecord = testRecord
-                    break
-                }
-            }
-            guard targetRecord != nil else { return }
-
-            var infoString = String(data: targetRecord!.data, encoding: .utf8) ?? ""
+            guard !allRecords.isEmpty else { return }
+            
+            let targetRecord = allRecords.first!
+            var infoString = String(data: targetRecord.data, encoding: .utf8) ?? ""
             infoString = infoString.replacingOccurrences(of: "\\n", with: "\n")
                 .replacingOccurrences(of: "\\\"", with: "\"")
 
@@ -49,7 +43,7 @@ final class ChatViewModel {
 //                content: infoString))
 
             // Parse the raw data into appropriate JSON
-            var jsonDict = try JSONSerialization.jsonObject(with: targetRecord!.data, options: []) as! [String: Any]
+            var jsonDict = try JSONSerialization.jsonObject(with: targetRecord.data, options: []) as! [String: Any]
             jsonDict.removeValue(forKey: "modelfile")
             jsonDict.removeValue(forKey: "license")  // testable with llama2:13b
 
@@ -62,7 +56,7 @@ final class ChatViewModel {
                         encodedValueAsString = valueAsString
                     }
                     else {
-                        let reencoded = try JSONSerialization.data(withJSONObject: value, options: [])
+                        let reencoded = try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
                         if let reencodedAsString = String(data: reencoded, encoding: .utf8) {
                             encodedValueAsString = reencodedAsString
                         }

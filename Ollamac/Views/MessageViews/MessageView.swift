@@ -39,8 +39,9 @@ struct MessageView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(chat.modelInfo) { pair in
                         Text(pair.description)
-                            .font(.title3)
+                            .font(.title3.weight(.semibold))
                         Text(pair.content)
+                            .font(.system(.body, design: .monospaced))
                             .padding([.leading], 8)
                     }
                 }

@@ -147,7 +147,7 @@ struct MessageListItemView: View {
             let tokenCountInfo = countTokens(in: text.renderPlainText())
             if tokenCountInfo != nil {
                 Text(tokenCountInfo!)
-                    .foregroundStyle(.brown)
+                    .foregroundStyle(.gray)
             }
 
             if let errorMessage {
