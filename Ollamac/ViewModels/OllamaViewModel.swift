@@ -34,7 +34,6 @@ final class OllamaViewModel {
         for model in prevModels {
             if onlineModels.contains(where: { $0.name == model.name }) {
                 model.isAvailable = true
-                await tryPopulateInfo(model)
             } else {
                 model.isAvailable = false
             }
@@ -43,7 +42,6 @@ final class OllamaViewModel {
         for newModel in onlineModels {
             let model = OllamaModel(name: newModel.name)
             model.isAvailable = true
-            await tryPopulateInfo(model)
 
             self.modelContext.insert(model)
 
@@ -56,16 +54,6 @@ final class OllamaViewModel {
 
         try self.modelContext.saveChanges()
         models = try self.fetchFromLocal()
-    }
-    
-    func tryPopulateInfo(_ model: OllamaModel) async {
-        do {
-            let modelInfo: OKModelInfoResponse = try await ollamaKit.modelInfo(data: OKModelInfoRequestData(name: model.name))
-            model.modelParameters = modelInfo.parameters
-            model.promptTemplate = modelInfo.template
-            model.systemPrompt = modelInfo.system
-        }
-        catch {}
     }
 
     private func fetchRawModelInfo(_ modelName: String) async -> Data? {

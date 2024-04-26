@@ -19,7 +19,7 @@ final class ChatViewModel {
         self.modelContext = modelContext
     }
     
-    private func tryPopulateModelInfo(_ chat: Chat) {
+    private func tryPopulateModelInfo(_ chat: Chat, enumerateAllInfo: Bool = false) {
         // Find any record that matches the Ollama model name.
         // Don't bother with `createdAt` or `modifiedAt`, since we'd need to embed that info into the chat's messages to be useful.
         let targetModelName = chat.model?.name ?? ""
@@ -32,20 +32,24 @@ final class ChatViewModel {
         do {
             let allRecords = try modelContext.fetch(fetchDescriptor)
             guard !allRecords.isEmpty else { return }
-            
+
             let targetRecord = allRecords.first!
             var infoString = String(data: targetRecord.data, encoding: .utf8) ?? ""
             infoString = infoString.replacingOccurrences(of: "\\n", with: "\n")
                 .replacingOccurrences(of: "\\\"", with: "\"")
 
-//            chat.modelInfo.append(ModelInfoPair(
-//                description: "Entire info blob",
-//                content: infoString))
+            if enumerateAllInfo {
+                chat.modelInfo.append(ModelInfoPair(
+                    description: "Entire info blob",
+                    content: infoString))
+            }
 
             // Parse the raw data into appropriate JSON
             var jsonDict = try JSONSerialization.jsonObject(with: targetRecord.data, options: []) as! [String: Any]
-            jsonDict.removeValue(forKey: "modelfile")
-            jsonDict.removeValue(forKey: "license")  // testable with llama2:13b
+            if !enumerateAllInfo {
+                jsonDict.removeValue(forKey: "modelfile")
+                jsonDict.removeValue(forKey: "license")  // testable with llama2:13b
+            }
 
             jsonDict.forEach { (key, value) in
                 print("[INFO] \(key) => \(value)")

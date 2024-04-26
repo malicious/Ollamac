@@ -13,10 +13,6 @@ final class OllamaModel: Identifiable {
     @Attribute(.unique) var name: String
     var isAvailable: Bool = false
 
-    @Attribute var modelParameters: String?
-    @Attribute var promptTemplate: String?
-    @Attribute var systemPrompt: String?
-
     @Relationship(deleteRule: .cascade, inverse: \Chat.model)
     var chats: [Chat] = []
     
