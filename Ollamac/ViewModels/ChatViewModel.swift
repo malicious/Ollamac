@@ -19,7 +19,7 @@ final class ChatViewModel {
         self.modelContext = modelContext
     }
     
-    private func tryPopulateModelInfo(_ chat: Chat, enumerateAllInfo: Bool = false) {
+    private func tryPopulateModelRecord(_ chat: Chat) {
         // Find any record that matches the Ollama model name.
         // Don't bother with `createdAt` or `modifiedAt`, since we'd need to embed that info into the chat's messages to be useful.
         let targetModelName = chat.model?.name ?? ""
@@ -34,44 +34,7 @@ final class ChatViewModel {
             guard !allRecords.isEmpty else { return }
 
             let targetRecord = allRecords.first!
-            var infoString = String(data: targetRecord.data, encoding: .utf8) ?? ""
-            infoString = infoString.replacingOccurrences(of: "\\n", with: "\n")
-                .replacingOccurrences(of: "\\\"", with: "\"")
-
-            if enumerateAllInfo {
-                chat.modelInfo.append(ModelInfoPair(
-                    description: "Entire info blob",
-                    content: infoString))
-            }
-
-            // Parse the raw data into appropriate JSON
-            var jsonDict = try JSONSerialization.jsonObject(with: targetRecord.data, options: []) as! [String: Any]
-            if !enumerateAllInfo {
-                jsonDict.removeValue(forKey: "modelfile")
-                jsonDict.removeValue(forKey: "license")  // testable with llama2:13b
-            }
-
-            jsonDict.forEach { (key, value) in
-                print("[INFO] \(key) => \(value)")
-                var encodedValueAsString = "[failed to re-encode]"
-                
-                do {
-                    if let valueAsString = value as? String {
-                        encodedValueAsString = valueAsString
-                    }
-                    else {
-                        let reencoded = try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
-                        if let reencodedAsString = String(data: reencoded, encoding: .utf8) {
-                            encodedValueAsString = reencodedAsString
-                        }
-                    }
-                }
-                catch {
-                    print("[ERROR] Failed to re-encode JSON value for \(key)")
-                }
-
-                chat.modelInfo.append(ModelInfoPair(description: key, content: encodedValueAsString))
-            }
+            chat.modelRecord = targetRecord
         }
         catch {
             print("[WARNING] Failed to populate model info for \(chat.model?.name ?? "[no model name]")")
@@ -84,20 +47,15 @@ final class ChatViewModel {
 
         self.chats = try self.modelContext.fetch(fetchDescriptor)
         for chat in self.chats {
-            // While fetching messages, also try to fetch the model record/parameters
-            tryPopulateModelInfo(chat)
-
-            for pair in chat.modelInfo {
-                print("[DEBUG] \(chat.model?.name) -- \(pair.description) => \(pair.content)")
-            }
+            tryPopulateModelRecord(chat)
         }
     }
 
     func create(_ chat: Chat) throws {
         self.modelContext.insert(chat)
         self.chats.insert(chat, at: 0)
-        tryPopulateModelInfo(chat)
-        
+        tryPopulateModelRecord(chat)
+
         try self.modelContext.saveChanges()
     }
     

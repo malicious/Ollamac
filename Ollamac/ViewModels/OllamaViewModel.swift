@@ -45,14 +45,15 @@ final class OllamaViewModel {
 
             self.modelContext.insert(model)
 
-            // Capture + construct raw model info record
+            // Capture + persist raw model info record
             if let rawModelInfo = await fetchRawModelInfo(newModel.name) {
-                print(String(data: rawModelInfo, encoding: .utf8))
                 _ = tryAddModelRecord(newModel.name, data: rawModelInfo)
             }
         }
 
         try self.modelContext.saveChanges()
+
+        // Refresh the entire list, once it's been merged into ModelContext
         models = try self.fetchFromLocal()
     }
 
@@ -66,7 +67,6 @@ final class OllamaViewModel {
     }
 
     private func tryAddModelRecord(_ name: String, data rawModelInfo: Data) -> OllamaModelRecord? {
-        let sortDescriptor = SortDescriptor(\OllamaModelRecord.createdAt)
         let fetchDescriptor = FetchDescriptor<OllamaModelRecord>(
             sortBy: [SortDescriptor(\OllamaModelRecord.createdAt),
                      SortDescriptor(\OllamaModelRecord.modelName)])
@@ -75,7 +75,7 @@ final class OllamaViewModel {
         do {
             let existingModels = try modelContext.fetch(fetchDescriptor)
             if existingModels.contains(where: { $0.data == rawModelInfo }) {
-                print("[DEBUG] model + identical data already exists, returning nil")
+//                print("[DEBUG] model + identical data already exists, returning nil")
                 returnedModel = nil
             } else {
                 returnedModel = OllamaModelRecord(name: name, data: rawModelInfo)

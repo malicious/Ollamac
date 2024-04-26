@@ -24,15 +24,15 @@ struct MessageView: View {
     
     @FocusState private var promptFocused: Bool
     @State private var prompt: String = ""
-    
+
     init(for chat: Chat) {
         self.chat = chat
     }
-    
+
     var isGenerating: Bool {
         messageViewModel.sendViewState == .loading
     }
-    
+
     var body: some View {
         ScrollViewReader { scrollViewProxy in
             if !chat.modelInfo.isEmpty {
