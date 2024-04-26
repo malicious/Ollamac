@@ -35,51 +35,46 @@ struct MessageView: View {
     
     var body: some View {
         ScrollViewReader { scrollViewProxy in
-//            ScrollView(.vertical) {
-//                VStack(spacing: 0) {
-                    if !chat.modelInfo.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(chat.modelInfo) { pair in
-                                Text(pair.description)
-                                    .font(.title3)
-                                Text(pair.content)
-                                    .padding([.leading], 8)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
+            if !chat.modelInfo.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(chat.modelInfo) { pair in
+                        Text(pair.description)
+                            .font(.title3)
+                        Text(pair.content)
+                            .padding([.leading], 8)
                     }
-                    
-                    List(messageViewModel.messages.indices, id: \.self) { index in
-                        let message = messageViewModel.messages[index]
-                        
-                        let rendered_prompt_text = MarkdownContent(message.prompt ?? "")
-                        MessageListItemView(rendered_prompt_text)
-                            .roleName("You")
-                            .promptCreatedAt(message.promptCreatedAt)
-                        
-                        let rendered_response_text = MarkdownContent(message.response ?? "")
-                        MessageListItemView(rendered_response_text) {
-                            regenerateAction(for: message)
-                        }
-                        .roleName("Assistant")
-                        .responseRequestedAt(message.responseRequestedAt)
-                        .responseFirstTokenAt(message.responseFirstTokenAt)
-                        .responseLastTokenAt(message.responseLastTokenAt)
-                        .generating(message.response.isNil && isGenerating)
-                        .finalMessage(index == messageViewModel.messages.endIndex - 1)
-                        .error(message.errorMessage, errorOccurredAt: message.errorOccurredAt)
-                        .id(message)
-                    }
-                    .onAppear {
-                        scrollToBottom(scrollViewProxy)
-                    }
-                    .onChange(of: messageViewModel.messages) {
-                        scrollToBottom(scrollViewProxy)
-                    }
-//                }
-//            }
-//            .frame(maxWidth: .infinity, maxHeight: scrollViewProxy.size.height)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+            }
+
+            List(messageViewModel.messages.indices, id: \.self) { index in
+                let message = messageViewModel.messages[index]
+                
+                let rendered_prompt_text = MarkdownContent(message.prompt ?? "")
+                MessageListItemView(rendered_prompt_text)
+                    .roleName("You")
+                    .promptCreatedAt(message.promptCreatedAt)
+                
+                let rendered_response_text = MarkdownContent(message.response ?? "")
+                MessageListItemView(rendered_response_text) {
+                    regenerateAction(for: message)
+                }
+                .roleName("Assistant")
+                .responseRequestedAt(message.responseRequestedAt)
+                .responseFirstTokenAt(message.responseFirstTokenAt)
+                .responseLastTokenAt(message.responseLastTokenAt)
+                .generating(message.response.isNil && isGenerating)
+                .finalMessage(index == messageViewModel.messages.endIndex - 1)
+                .error(message.errorMessage, errorOccurredAt: message.errorOccurredAt)
+                .id(message)
+            }
+            .onAppear {
+                scrollToBottom(scrollViewProxy)
+            }
+            .onChange(of: messageViewModel.messages) {
+                scrollToBottom(scrollViewProxy)
+            }
             
             // TODO: Why is this in the scroll?
             HStack(alignment: .bottom) {

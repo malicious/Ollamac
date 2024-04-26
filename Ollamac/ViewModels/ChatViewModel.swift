@@ -44,29 +44,36 @@ final class ChatViewModel {
             infoString = infoString.replacingOccurrences(of: "\\n", with: "\n")
                 .replacingOccurrences(of: "\\\"", with: "\"")
 
-            chat.modelInfo.append(ModelInfoPair(
-                description: "Entire info blob",
-                content: infoString))
+//            chat.modelInfo.append(ModelInfoPair(
+//                description: "Entire info blob",
+//                content: infoString))
 
-//            // Parse the raw data into appropriate JSON
-//            var jsonDict = try JSONSerialization.jsonObject(with: targetRecord.data, options: []) as! [String: Any]
-//            jsonDict.removeValue(forKey: "modelfile")
-//
-//            jsonDict.forEach { (key, value) in
-//                var valueAsString = "[failed to re-encode]"
-//
-//                do {
-//                    let reencoded = try JSONSerialization.data(withJSONObject: value, options: [])
-//                    if let reencodedAsString = String(data: reencoded, encoding: .utf8) {
-//                        valueAsString = reencodedAsString
-//                    }
-//                }
-//                catch {
-//                    print("[ERROR] Failed to re-encode JSON value for \(key)")
-//                }
-//
-//                chat.modelInfo.append(ModelInfoPair(description: key, content: valueAsString))
-//            }
+            // Parse the raw data into appropriate JSON
+            var jsonDict = try JSONSerialization.jsonObject(with: targetRecord!.data, options: []) as! [String: Any]
+            jsonDict.removeValue(forKey: "modelfile")
+            jsonDict.removeValue(forKey: "license")  // testable with llama2:13b
+
+            jsonDict.forEach { (key, value) in
+                print("[INFO] \(key) => \(value)")
+                var encodedValueAsString = "[failed to re-encode]"
+                
+                do {
+                    if let valueAsString = value as? String {
+                        encodedValueAsString = valueAsString
+                    }
+                    else {
+                        let reencoded = try JSONSerialization.data(withJSONObject: value, options: [])
+                        if let reencodedAsString = String(data: reencoded, encoding: .utf8) {
+                            encodedValueAsString = reencodedAsString
+                        }
+                    }
+                }
+                catch {
+                    print("[ERROR] Failed to re-encode JSON value for \(key)")
+                }
+
+                chat.modelInfo.append(ModelInfoPair(description: key, content: encodedValueAsString))
+            }
         }
         catch {
             print("[WARNING] Failed to populate model info for \(chat.model?.name ?? "[no model name]")")
@@ -81,6 +88,10 @@ final class ChatViewModel {
         for chat in self.chats {
             // While fetching messages, also try to fetch the model record/parameters
             tryPopulateModelInfo(chat)
+
+            for pair in chat.modelInfo {
+                print("[DEBUG] \(chat.model?.name) -- \(pair.description) => \(pair.content)")
+            }
         }
     }
 
