@@ -29,18 +29,18 @@ final class ChatViewModel {
 
         do {
             // TODO: We only need one record. Also, make sure it's the most recent, not the least recent.
+            var targetRecord: OllamaModelRecord? = nil
+
             let allRecords = try modelContext.fetch(fetchDescriptor)
-//            guard { length(allRecords) > 1 } else { return }
-            
-            var targetRecord = allRecords[0]
             for testRecord in allRecords {
                 if testRecord.modelName == chat.model?.name {
                     targetRecord = testRecord
                     break
                 }
             }
-            
-            var infoString = String(data: targetRecord.data, encoding: .utf8) ?? ""
+            guard targetRecord != nil else { return }
+
+            var infoString = String(data: targetRecord!.data, encoding: .utf8) ?? ""
             infoString = infoString.replacingOccurrences(of: "\\n", with: "\n")
                 .replacingOccurrences(of: "\\\"", with: "\"")
 
