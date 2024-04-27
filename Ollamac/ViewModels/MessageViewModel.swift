@@ -116,11 +116,14 @@ final class MessageViewModel {
         try? self.modelContext.saveChanges()
     }
     
-    private func handleReceive(_ response: OKGenerateResponse) {
-        // DEBUG: dump tokens so we can figure out why spaces disappear sometimes
-        let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        print("[\(df.string(from: Date.now))] new token(s) -- \"\(response.response)\"")
+    private func handleReceive(_ response: OKGenerateResponse, dumpStreamingResponse: Bool = false) {
+        if dumpStreamingResponse {
+            // DEBUG: dump tokens so we can figure out why spaces disappear sometimes
+            //        (update: you're just configuring the model poorly, its parameters are all wrong)
+            let df = DateFormatter()
+            df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+            print("[\(df.string(from: Date.now))] new token(s) -- \"\(response.response)\"")
+        }
 
         // This can happen if we get out of sync with the server; ignore it and move on.
         // TODO: Specifically, we don't close our Ollama connections, and can keep receiving data.
