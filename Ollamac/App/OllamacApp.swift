@@ -9,6 +9,48 @@ import OllamaKit
 import SwiftUI
 import SwiftData
 
+func startOrCheckOllama(forceProxy: Bool = true) -> URL {
+    do {
+        // For now, we manually include this with something like:
+        //
+        //     cd ~/Library/Developer/Xcode/DerivedData/Ollamac-*/Build/Products/Debug/Ollamac.app/Contents/MacOS
+        //     ln -s /path/to/proxy-server proxy-server
+        let process = Process()
+        let helper = Bundle.main.path(forAuxiliaryExecutable: "proxy-server")!
+        process.executableURL = URL(fileURLWithPath: helper)
+        
+        // TODO: Merge tool code from https://developer.apple.com/forums/thread/690310
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        
+        let outHandle = pipe.fileHandleForReading
+        outHandle.readabilityHandler = { pipe in
+            if let line = String(data: pipe.availableData, encoding: .utf8) {
+                if !line.isEmpty {
+                    print("[proxy-server] \(line)")
+                }
+            } else {
+                print("Error decoding proxy-server data: \(pipe.availableData)")
+            }
+        }
+
+        // Try running the embedded Ollama server, first
+        try process.run()
+        print("[INFO] Starting proxy-server with pid \(process.processIdentifier)")
+
+        return URL(string: "http://localhost:9750/ollama-proxy")!
+    }
+    catch {
+        if forceProxy {
+            print("Forcing use of Ollama proxy on port 9750: \(error)")
+            return URL(string: "http://localhost:9750/ollama-proxy")!
+        }
+
+        print("Failed to run embedded Ollama proxy, falling back to direct Ollama connection: \(error)")
+        return URL(string: "http://localhost:11434")!
+    }
+}
+
 @main
 struct OllamacApp: App {
     @State private var commandViewModel: CommandViewModel
@@ -27,19 +69,18 @@ struct OllamacApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
-    
+
     init() {
         let modelContext = sharedModelContainer.mainContext
 
         let commandViewModel = CommandViewModel()
         _commandViewModel = State(initialValue: commandViewModel)
-        
-        let ollamaURL = URL(string: "http://localhost:11434")!
-        let ollamaKit = OllamaKit(baseURL: ollamaURL)
-                
+
+        let ollamaKit = OllamaKit(baseURL: startOrCheckOllama())
+
         let ollamaViewModel = OllamaViewModel(modelContext: modelContext, ollamaKit: ollamaKit)
         _ollamaViewModel = State(initialValue: ollamaViewModel)
-        
+
         let messageViewModel = MessageViewModel(modelContext: modelContext, ollamaKit: ollamaKit)
         _messageViewModel = State(initialValue: messageViewModel)
         
