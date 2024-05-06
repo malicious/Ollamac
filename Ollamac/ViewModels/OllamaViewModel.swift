@@ -21,11 +21,15 @@ final class OllamaViewModel {
         self.modelContext = modelContext
         self.ollamaKit = ollamaKit
     }
-    
+
+    func updateOllamaUri(_ baseURL: URL) {
+        self.ollamaKit = OllamaKit(baseURL: baseURL)
+    }
+
     func isReachable() async -> Bool {
         await ollamaKit.reachable()
     }
-    
+
     @MainActor
     func fetch() async throws {
         let prevModels = try self.fetchFromLocal()

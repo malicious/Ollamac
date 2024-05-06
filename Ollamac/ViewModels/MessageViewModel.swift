@@ -26,9 +26,13 @@ final class MessageViewModel {
         self.modelContext = modelContext
         self.ollamaKit = ollamaKit
     }
-    
+
     deinit {
         self.stopGenerate()
+    }
+
+    func updateOllamaUri(_ baseURL: URL) {
+        self.ollamaKit = OllamaKit(baseURL: baseURL)
     }
 
     func fetch(for chat: Chat) throws {

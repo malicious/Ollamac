@@ -23,3 +23,6 @@ struct TextError: View {
 #Preview {
     TextError(AppMessages.generalErrorMessage)
 }
+#Preview {
+    TextError("Error: This is an extremely long error string. The Ollama server cannot be reached at the moment. Make sure to implement word wrap so you do not suffer the same terrible fate.")
+}
