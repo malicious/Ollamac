@@ -61,9 +61,11 @@ struct AddChatView: View {
                         .onSubmit {
                             viewState = .loading
                             if let targetURL = URL(string: enteredOllamaUri) {
+                                // TODO: Ideally, we do the check-if-available before updating.
+                                //       I suppose we could just create a new OllamaKit object _here_, the way Enchanted makes an OllamaService.
                                 ollamaViewModel.updateOllamaUri(targetURL)
-                                fetchAction()
                                 messageViewModel.updateOllamaUri(targetURL)
+                                fetchAction()
                                 storedOllamaUri = enteredOllamaUri
                             } else {
                                 viewState = .error(message: "Invalid endpoint, edit and press [Enter] to try again")

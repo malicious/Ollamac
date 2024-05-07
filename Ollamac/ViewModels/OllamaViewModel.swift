@@ -14,6 +14,7 @@ import OllamaKit
 final class OllamaViewModel {
     private var modelContext: ModelContext
     private var ollamaKit: OllamaKit
+    private var ollamaKitBaseURL: URL? = nil
     
     var models: [OllamaModel] = []
     
@@ -24,6 +25,10 @@ final class OllamaViewModel {
 
     func updateOllamaUri(_ baseURL: URL) {
         self.ollamaKit = OllamaKit(baseURL: baseURL)
+    }
+
+    func getOllamaUri() -> String {
+        return self.ollamaKitBaseURL?.absoluteString ?? "[using default URL]"
     }
 
     func isReachable() async -> Bool {

@@ -37,6 +37,8 @@ struct MessageView: View {
         ScrollViewReader { scrollViewProxy in
             if chat.hasModelInfo {
                 VStack(alignment: .leading, spacing: 8) {
+                    Text("MessageViewModel: \(messageViewModel.getOllamaUri())")
+                    Text("OllamaViewModel: \(ollamaViewModel.getOllamaUri())")
                     ForEach(chat.modelInfo) { pair in
                         Text(pair.description)
                             .font(.title3.weight(.semibold))

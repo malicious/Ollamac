@@ -17,6 +17,7 @@ final class MessageViewModel {
     
     private var modelContext: ModelContext
     private var ollamaKit: OllamaKit
+    private var ollamaKitBaseURL: URL? = nil
     private var stayAwake: StayAwake?
     
     var messages: [Message] = []
@@ -33,6 +34,11 @@ final class MessageViewModel {
 
     func updateOllamaUri(_ baseURL: URL) {
         self.ollamaKit = OllamaKit(baseURL: baseURL)
+        self.ollamaKitBaseURL = baseURL
+    }
+
+    func getOllamaUri() -> String {
+        return self.ollamaKitBaseURL?.absoluteString ?? "[using default URL]"
     }
 
     func fetch(for chat: Chat) throws {
