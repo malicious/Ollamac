@@ -25,6 +25,7 @@ final class OllamaViewModel {
 
     func updateOllamaUri(_ baseURL: URL) {
         self.ollamaKit = OllamaKit(baseURL: baseURL)
+        self.models = []
     }
 
     func getOllamaUri() -> String {

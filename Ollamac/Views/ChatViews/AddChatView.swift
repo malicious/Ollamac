@@ -59,6 +59,12 @@ struct AddChatView: View {
                     TextField("Ollama", text: $enteredOllamaUri)
                         .disabled(isLoading)
                         .onSubmit {
+                            // Clear and reset the model; this should be done in fetchAction or similar, though.
+                            var selectedModelName = selectedModel?.name
+                            selectedModel = nil
+                            // DEBUG: app still crashes frequently when changing endpoints/models.
+                            selectedModelName = nil
+
                             viewState = .loading
                             if let targetURL = URL(string: enteredOllamaUri) {
                                 // TODO: Ideally, we do the check-if-available before updating.
@@ -67,6 +73,10 @@ struct AddChatView: View {
                                 messageViewModel.updateOllamaUri(targetURL)
                                 fetchAction()
                                 storedOllamaUri = enteredOllamaUri
+
+                                if selectedModelName != nil {
+                                    selectedModel = ollamaViewModel.models.first(where: { $0.name == selectedModelName })
+                                }
                             } else {
                                 viewState = .error(message: "Invalid endpoint, edit and press [Enter] to try again")
                             }
@@ -84,6 +94,18 @@ struct AddChatView: View {
                     }
                     .padding(.top, 8)
                     .disabled(isLoading)
+
+                    List(ollamaViewModel.models, id: \.name) { model in
+                        Text(model.name)
+                            .monospaced()
+                            .lineLimit(1)
+                            .disabled(model.isNotAvailable)
+                            .foregroundColor(model.isAvailable ? .accent : .gray)
+                            .onTapGesture {
+                                selectedModel = model
+                            }
+                    }
+                    .frame(minHeight: 400)
                 }, header: {
                 }, footer: {
                     if let selectedModel, selectedModel.isNotAvailable {
